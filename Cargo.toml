@@ -1,0 +1,13 @@
+[package]
+name = "shelf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = {version = "1.40.0", features = ["full"]}
+reqwest = "0.12.7"
+log = "0.4.22"
+axum = {version = "0.7.6", features = ["tracing", "tower-log"]}
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tower-http = { version = "0.6.1", features = ["trace"] }
