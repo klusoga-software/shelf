@@ -1,7 +1,7 @@
 use crate::error::Error;
 use axum::Router;
 use tower_http::trace::TraceLayer;
-use tracing_subscriber::{EnvFilter, Layer};
+use tracing_subscriber::EnvFilter;
 
 mod controller;
 
