@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - directory: /
+    package-ecosystem: cargo
+    schedule:
+      interval: daily
+    groups:
+      cargo:
+        patterns:
+          - "*"
+  - directory: /
+    package-ecosystem: docker
+    schedule:
+      interval: daily
+    groups:
+      docker:
+        patterns:
+          - "*"
+  - directory: /
+    package-ecosystem: github-actions
+    schedule:
+      interval: daily
+    groups:
+      github:
+        patterns:
+          - "*"
+
