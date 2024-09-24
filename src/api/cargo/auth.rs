@@ -1,4 +1,3 @@
-
 pub async fn me() -> String {
     format!(
         "{}/cargo/auth",

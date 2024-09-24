@@ -9,7 +9,5 @@ pub mod index;
 pub mod models;
 
 pub fn get_router() -> Router {
-    Router::new()
-        .route("/me", get(me))
-        .route("/index", get(index))
+    Router::new().route("/me", get(me)).nest("/index", index())
 }
