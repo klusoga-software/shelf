@@ -1,4 +1,3 @@
-use std::env::VarError;
 
 pub async fn me() -> String {
     format!(
