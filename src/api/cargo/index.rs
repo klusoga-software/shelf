@@ -8,5 +8,7 @@ pub async fn index() -> Result<Json<Index>, Json<Error>> {
         std::env::var("BASE_URL").unwrap_or("http://localhost:6300".to_string())
     );
 
-    Ok(Json::from(Index { dl, api: None }))
+    let api = std::env::var("BASE_URL").unwrap_or("http://localhost:6300".to_string());
+
+    Ok(Json::from(Index { dl, api: Some(api) }))
 }
