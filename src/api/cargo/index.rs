@@ -1,6 +1,5 @@
-use axum::Router;
-use tower_http::services::ServeDir;
+use actix_files::Files;
 
-pub fn index() -> Router {
-    Router::new().nest_service("/", ServeDir::new("assets"))
+pub fn index() -> Files {
+    Files::new("/index", "/assets")
 }
