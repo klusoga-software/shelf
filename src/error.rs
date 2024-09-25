@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub enum Error {
     IO(std::io::Error),
+    CrateParseError(String),
 }
 
 impl From<std::io::Error> for Error {
@@ -16,6 +17,9 @@ impl Display for Error {
         match self {
             Error::IO(err) => {
                 write!(f, "{}", err)
+            }
+            Error::CrateParseError(err) => {
+                write!(f, "Crate Parse Error: {}", err)
             }
         }
     }
