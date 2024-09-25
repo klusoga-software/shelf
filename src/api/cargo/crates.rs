@@ -4,6 +4,7 @@ use actix_web::web::{Buf, Bytes};
 use actix_web::{put, HttpResponse, Responder};
 use serde_json::json;
 use sha2::{Digest, Sha256};
+use std::env;
 use std::fs::{read_to_string, DirBuilder, File, OpenOptions};
 use std::io::Read;
 use std::io::{self, Write};
@@ -77,9 +78,11 @@ fn parse_crate<R: Read>(mut reader: R) -> Result<(), Error> {
 
     writeln!(metadata_file, "{}", serde_json::to_string(&crate_index)?)?;
 
+    let crates_dir = env::var("CRATES_DIR").unwrap_or("crates".to_string());
+
     let mut crate_file = File::create(format!(
-        "crates/{}_{}.crate",
-        &metadata.name, &metadata.vers
+        "{}/{}_{}.crate",
+        crates_dir, &metadata.name, &metadata.vers
     ))?;
 
     crate_file.write_all(crate_buffer.as_slice())?;
