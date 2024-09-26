@@ -1,4 +1,4 @@
-use crate::api::cargo::crates::upload;
+use crate::api::cargo::crates::{download, upload};
 use crate::api::cargo::index::{config, index_files};
 use actix_web::web;
 use auth::me;
@@ -16,4 +16,5 @@ pub fn get_cargo_scope() -> actix_web::Scope {
         .service(index_files)
         .service(upload)
         .service(me)
+        .service(download)
 }

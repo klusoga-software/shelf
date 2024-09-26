@@ -1,3 +1,4 @@
+use crate::api::models::{Error, ErrorResponse};
 use actix_web::http::header::ContentType;
 use actix_web::{get, web, HttpResponse, Responder};
 use std::{fs::File, io::Read};
@@ -29,7 +30,16 @@ pub async fn config() -> impl Responder {
 
 #[get("/index/{name:.*}")]
 pub async fn index_files(name: web::Path<String>) -> impl Responder {
-    let mut file = File::open(format!("assets/{}", name)).unwrap();
+    let mut file = match File::open(format!("assets/{}", name)) {
+        Ok(file) => file,
+        Err(_) => {
+            return HttpResponse::NotFound().json(ErrorResponse {
+                errors: vec![Error {
+                    detail: "The requested crate was not found".to_string(),
+                }],
+            })
+        }
+    };
 
     let mut config_content = String::new();
 

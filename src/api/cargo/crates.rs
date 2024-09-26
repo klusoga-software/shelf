@@ -1,7 +1,8 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
 use crate::error::Error;
+use actix_files::NamedFile;
 use actix_web::web::{Buf, Bytes};
-use actix_web::{put, HttpResponse, Responder};
+use actix_web::{get, put, web, HttpResponse, Responder};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::env;
@@ -17,6 +18,20 @@ pub async fn upload(body: Bytes) -> impl Responder {
     };
 
     HttpResponse::Ok().json(json!({}))
+}
+
+#[get("/crates/{name}/{version}/download")]
+pub async fn download(path: web::Path<(String, String)>) -> actix_web::Result<NamedFile> {
+    let crates_dir = env::var("CRATES_DIR").unwrap_or("crates".to_string());
+
+    let (name, version) = path.into_inner();
+
+    let file = match NamedFile::open(format!("{}/{}_{}.crate", crates_dir, name, version)) {
+        Ok(file) => file,
+        Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
+    };
+
+    Ok(file)
 }
 
 fn parse_crate<R: Read>(mut reader: R) -> Result<(), Error> {
