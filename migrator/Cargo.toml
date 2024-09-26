@@ -1,0 +1,8 @@
+[package]
+name = "migrator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlx = {version = "0.8.2", features = ["runtime-tokio", "migrate", "postgres"]}
+tokio = {version = "1.40.0", features = ["full"]}
