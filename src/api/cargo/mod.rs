@@ -13,8 +13,8 @@ pub mod crates;
 pub fn get_cargo_scope() -> actix_web::Scope {
     web::scope("/cargo")
         .service(config)
+        .service(me)
         .service(index_files)
         .service(upload)
-        .service(me)
         .service(download)
 }
