@@ -57,7 +57,7 @@ jobs:
             })  
 
   release:
-    name: Release docker image
+    name: Release Api docker image
     runs-on: ubuntu-latest
     outputs:
       IMAGE: ${{ steps.push.outputs.IMAGE }}
@@ -83,6 +83,7 @@ jobs:
           echo "IMAGE=${{ env.IMAGE }}:${{ needs.tag.outputs.semver }}" >> $GITHUB_OUTPUT
 
   deploy_dev:
+    name: Deploy Api
     runs-on: ubuntu-latest
     needs:
       - release
@@ -123,7 +124,7 @@ jobs:
           git push
 
   release_ui:
-    name: Release docker image
+    name: Release Ui docker image
     runs-on: ubuntu-latest
     outputs:
       IMAGE: ${{ steps.push.outputs.IMAGE }}
@@ -150,9 +151,10 @@ jobs:
           echo "IMAGE=${{ env.IMAGE }}:${{ needs.tag.outputs.semver }}" >> $GITHUB_OUTPUT
 
   deploy_dev_ui:
+    name: Deploy UI
     runs-on: ubuntu-latest
     needs:
-      - release
+      - release_ui
     steps:
       - name: Generate token
         id: generate_token
