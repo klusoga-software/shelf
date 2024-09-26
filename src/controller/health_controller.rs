@@ -1,10 +1,6 @@
-use axum::routing::get;
-use axum::Router;
+use actix_web::{get, HttpResponse, Responder};
 
-pub fn get_router() -> Router {
-    Router::new().route("/", get(get_health))
-}
-
-pub async fn get_health() -> &'static str {
-    "OK"
+#[get("/health")]
+pub async fn get_health() -> impl Responder {
+    HttpResponse::Ok().body("Ok")
 }
