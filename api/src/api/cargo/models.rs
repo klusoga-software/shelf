@@ -2,6 +2,15 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct IndexConfig {
+    pub dl: String,
+    pub api: String,
+
+    #[serde(rename = "auth-required")]
+    pub auth_required: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Metadata {
     pub name: String,
     pub vers: String,

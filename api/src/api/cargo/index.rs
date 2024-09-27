@@ -1,31 +1,33 @@
+use crate::api::cargo::models::IndexConfig;
 use crate::api::models::{Error, ErrorResponse};
+use crate::repository::cargo_repository::CargoRepository;
 use actix_web::http::header::ContentType;
+use actix_web::web::Path;
 use actix_web::{get, web, HttpResponse, Responder};
 use std::{fs::File, io::Read};
 
-#[get("/index/config.json")]
-pub async fn config() -> impl Responder {
-    let mut config = match File::open("assets/config.json") {
-        Ok(file) => file,
-        Err(err) => {
-            return HttpResponse::InternalServerError()
-                .body(format!("Error while receive config file {}", err))
-        }
+#[get("/{name}/index/config.json")]
+pub async fn config(name: Path<String>, pool: web::Data<CargoRepository>) -> impl Responder {
+    let repo = match pool.get_repo_by_name(name.as_str()).await {
+        Ok(repo) => repo,
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
 
-    let mut config_content = String::new();
+    let config_doc = match pool.get_config_by_repo(&repo.id).await {
+        Ok(config) => config,
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+    };
 
-    match config.read_to_string(&mut config_content) {
-        Ok(_) => (),
-        Err(err) => {
-            return HttpResponse::InternalServerError()
-                .body(format!("Error while receive config file {}", err))
-        }
-    }
+    let index_config = IndexConfig {
+        dl: config_doc.dl,
+
+        api: config_doc.api,
+        auth_required: !repo.public,
+    };
 
     HttpResponse::Ok()
         .content_type(ContentType::json())
-        .body(config_content)
+        .body(serde_json::to_string(&index_config).unwrap())
 }
 
 #[get("/index/{name:.*}")]
