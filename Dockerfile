@@ -35,8 +35,8 @@ RUN --mount=type=bind,source=api,target=api \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
 cargo build --locked --release && \
-cp ./target/release/$APP_NAME /bin/server
-
+cp ./target/release/$APP_NAME /bin/server && \
+cp ./target/release/migrator /bin/migrator
 ################################################################################
 # Create a new stage for running the application that contains the minimal
 # runtime dependencies for the application. This often uses a different base
@@ -51,6 +51,7 @@ FROM alpine:3 AS final
 
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
+COPY --from=build /bin/migrator /bin/
 
 # Expose the port that the application listens on.
 EXPOSE 6300
