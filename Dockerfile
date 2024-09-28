@@ -52,6 +52,9 @@ FROM alpine:3 AS final
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
 COPY --from=build /bin/migrator /bin/
+COPY migrations /migrations
+
+ENV MIGRATIONS_DIR=/migrations
 
 # Expose the port that the application listens on.
 EXPOSE 6300
