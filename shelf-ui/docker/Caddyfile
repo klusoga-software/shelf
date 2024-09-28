@@ -1,5 +1,6 @@
 http://:80 {
-    root /ui/* /var/www/shelf
+    rewrite /ui /
+    root * /var/www/shelf
     try_files {path} /index.html
     file_server
 }
