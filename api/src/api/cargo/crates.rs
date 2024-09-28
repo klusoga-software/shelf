@@ -68,7 +68,7 @@ pub async fn download(
     };
 
     let crate_index = match state
-        .get_index_by_name_id_and_version(&crate_name, &version, repo.id.unwrap())
+        .get_index_by_name_id_and_version(&crate_name, &version, &repo.id.unwrap())
         .await
     {
         Ok(index) => index,

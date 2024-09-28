@@ -1,7 +1,7 @@
 use crate::repository::models::{Config, Crate, Repo};
 use log::trace;
 use sqlx::postgres::{PgQueryResult, PgRow};
-use sqlx::{Error, Pool, Postgres};
+use sqlx::{Error, Pool, Postgres, Row};
 
 #[derive(Clone)]
 pub struct CargoRepository {
@@ -19,17 +19,38 @@ impl CargoRepository {
             .await
     }
 
-    pub async fn delete_repo(&self, id: i32) -> Result<PgQueryResult, Error> {
-        sqlx::query("delete from repos where id = $")
+    pub async fn delete_repo(&self, id: &i32) -> Result<PgQueryResult, Error> {
+        sqlx::query("delete from repos where id = $1")
+            .bind(id)
             .execute(&self.pool)
             .await
     }
 
-    pub async fn create_repo(&self, repo: Repo) -> Result<PgQueryResult, Error> {
-        sqlx::query(r#"insert into repos (name, repo_type, public) VALUES ($1, $2, $3)"#)
-            .bind(repo.name)
-            .bind(repo.repo_type)
-            .bind(repo.public)
+    pub async fn create_repo(&self, repo: Repo) -> Result<i32, Error> {
+        let row = sqlx::query(
+            r#"insert into repos (name, repo_type, public) VALUES ($1, $2, $3) returning id"#,
+        )
+        .bind(repo.name)
+        .bind(repo.repo_type)
+        .bind(repo.public)
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(row.get("id"))
+    }
+
+    pub async fn create_config(&self, config: Config) -> Result<PgQueryResult, Error> {
+        sqlx::query(r#"insert into configs (repo_id, dl, api) values ($1, $2, $3)"#)
+            .bind(config.repo_id)
+            .bind(config.dl)
+            .bind(config.api)
+            .execute(&self.pool)
+            .await
+    }
+
+    pub async fn delete_config(&self, repo_id: &i32) -> Result<PgQueryResult, Error> {
+        sqlx::query("delete from configs where repo_id = $1")
+            .bind(repo_id)
             .execute(&self.pool)
             .await
     }
@@ -68,7 +89,11 @@ RETURNING id
         .await
     }
 
-    pub async fn get_index_by_name_and_id(&self, name: &str, id: i32) -> Result<Vec<Crate>, Error> {
+    pub async fn get_index_by_name_and_id(
+        &self,
+        name: &str,
+        id: &i32,
+    ) -> Result<Vec<Crate>, Error> {
         sqlx::query_as::<_, Crate>(
             r#"select id, name, path, repo_id, version, index from crates where name = $1 and repo_id = $2"#,
         )
@@ -82,7 +107,7 @@ RETURNING id
         &self,
         name: &str,
         version: &str,
-        id: i32,
+        id: &i32,
     ) -> Result<Option<Crate>, Error> {
         trace!(
             "Fetch crate: {} for version {} and repo id {}",

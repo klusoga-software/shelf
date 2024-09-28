@@ -12,10 +12,8 @@ pub enum RepositoryType {
 pub struct Config {
     pub api: String,
     pub dl: String,
-    #[sqlx(rename = "id")]
-    pub _id: i32,
-    #[sqlx(rename = "repo_id")]
-    pub _repo_id: i32,
+    pub id: Option<i32>,
+    pub repo_id: i32,
 }
 
 #[derive(sqlx::FromRow, Serialize)]
