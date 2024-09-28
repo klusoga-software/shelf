@@ -185,7 +185,7 @@ jobs:
         run: |
           cd shelf-manifests
           cd overlays/dev
-          kustomize edit set image ${{needs.release.outputs.IMAGE}}
+          kustomize edit set image ${{needs.release_ui.outputs.IMAGE}}
           cd ../../
           git config --global user.email "support@klusoga.de"
           git config --global user.name "Gitlab CI"
