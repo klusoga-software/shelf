@@ -148,7 +148,7 @@ jobs:
         id: push
         run: |
           cd shelf-ui
-          docker build --build-arg --build-arg VITE_MODE=production --build-arg VERSION=${{ needs.tag.outputs.semver }} --push -t ${{ env.UI_IMAGE }}:${{ needs.tag.outputs.semver }} .
+          docker build --build-arg VITE_MODE=production --build-arg VERSION=${{ needs.tag.outputs.semver }} --push -t ${{ env.UI_IMAGE }}:${{ needs.tag.outputs.semver }} .
           echo "IMAGE=${{ env.UI_IMAGE }}:${{ needs.tag.outputs.semver }}" >> $GITHUB_OUTPUT
 
   deploy_dev_ui:
