@@ -1,5 +1,6 @@
 use crate::api::cargo::get_cargo_scope;
-use crate::controller::health_controller::get_health;
+use crate::api::health_controller::get_health;
+use crate::api::repo_controller::repo_controller;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
@@ -10,8 +11,6 @@ use actix_web::middleware::{from_fn, Logger, Next};
 use actix_web::{web, App, Error, HttpServer};
 use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
-
-mod controller;
 
 mod error;
 
@@ -61,6 +60,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(cargo_repository.clone()))
             .app_data(web::Data::new(storage))
             .service(get_health)
+            .service(repo_controller())
             .service(get_cargo_scope())
     })
     .bind(("0.0.0.0", 6300))?

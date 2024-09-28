@@ -13,7 +13,7 @@ async fn main() {
         .connect(connection_url.as_str())
         .await
         .expect("Failed to connect to database");
-    
+
     let migrations_path = std::env::var("MIGRATIONS_DIR").unwrap_or("./migrations".to_string());
 
     let migrator: Migrator = Migrator::new(Path::new(migrations_path.as_str()))

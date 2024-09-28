@@ -1,5 +1,12 @@
 use crate::api::cargo::models::CrateIndex;
+use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
+
+#[derive(sqlx::Type, Serialize, Deserialize, Clone)]
+#[repr(i32)]
+pub enum RepositoryType {
+    Cargo = 1,
+}
 
 #[derive(sqlx::FromRow)]
 pub struct Config {
@@ -11,13 +18,11 @@ pub struct Config {
     pub _repo_id: i32,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(sqlx::FromRow, Serialize)]
 pub struct Repo {
-    pub id: i32,
-    #[sqlx(rename = "name")]
-    pub _name: String,
-    #[sqlx(rename = "repo_type")]
-    pub _repo_type: i32,
+    pub id: Option<i32>,
+    pub name: String,
+    pub repo_type: RepositoryType,
     pub public: bool,
 }
 

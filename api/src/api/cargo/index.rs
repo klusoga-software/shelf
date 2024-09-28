@@ -11,7 +11,7 @@ pub async fn config(name: Path<String>, pool: web::Data<CargoRepository>) -> imp
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
 
-    let config_doc = match pool.get_config_by_repo(&repo.id).await {
+    let config_doc = match pool.get_config_by_repo(&repo.id.unwrap()).await {
         Ok(config) => config,
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
@@ -42,7 +42,10 @@ pub async fn index_files(
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
 
-    let crate_index = match state.get_index_by_name_and_id(crate_name, repo.id).await {
+    let crate_index = match state
+        .get_index_by_name_and_id(crate_name, repo.id.unwrap())
+        .await
+    {
         Ok(index) => index,
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };

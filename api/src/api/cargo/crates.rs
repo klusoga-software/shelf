@@ -38,7 +38,7 @@ pub async fn upload(
             version: crate_index.vers.clone(),
             index: Json(crate_index),
             path: crate_path.clone(),
-            repo_id: repo.id,
+            repo_id: repo.id.unwrap(),
             _id: None,
         })
         .await
@@ -68,7 +68,7 @@ pub async fn download(
     };
 
     let crate_index = match state
-        .get_index_by_name_id_and_version(&crate_name, &version, repo.id)
+        .get_index_by_name_id_and_version(&crate_name, &version, repo.id.unwrap())
         .await
     {
         Ok(index) => index,
