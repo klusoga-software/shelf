@@ -1,0 +1,5 @@
+http://:80 {
+	root * /var/www/shelf
+	try_files {path} /index.html
+	file_server
+}

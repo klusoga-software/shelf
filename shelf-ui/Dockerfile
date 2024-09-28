@@ -55,5 +55,5 @@ RUN pnpm run build -m $VITE_MODE
 FROM caddy:2-alpine
 EXPOSE 80
 COPY docker/Caddyfile /etc/caddy/Caddyfile
-COPY --from=build /usr/src/app/dist /var/www/klusoga-bot-ui
+COPY --from=build /usr/src/app/dist /var/www/shelf
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
