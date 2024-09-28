@@ -5,7 +5,6 @@ pub enum Error {
     IO(std::io::Error),
     CrateParse(String),
     JsonParse(serde_json::Error),
-    VersionExists(String),
 }
 
 impl From<std::io::Error> for Error {
@@ -31,9 +30,6 @@ impl Display for Error {
             }
             Error::JsonParse(err) => {
                 write!(f, "Parse Json failed: {}", err)
-            }
-            Error::VersionExists(err) => {
-                write!(f, "{}", err)
             }
         }
     }

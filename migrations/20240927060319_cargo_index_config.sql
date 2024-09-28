@@ -5,7 +5,7 @@ create table configs
             primary key,
     repo_id integer
         constraint configs_repos_id_fk
-            references repos,
-    dl varchar,
-    api varchar
+            references repos not null,
+    dl varchar not null,
+    api varchar not null
 );

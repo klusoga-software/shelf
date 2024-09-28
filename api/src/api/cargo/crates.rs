@@ -1,18 +1,53 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
 use crate::error::Error;
+use crate::repository::cargo_repository::CargoRepository;
+use crate::repository::models::Crate;
+use crate::storage::Storage;
 use actix_files::NamedFile;
 use actix_web::web::{Buf, Bytes};
 use actix_web::{get, put, web, HttpResponse, Responder};
 use serde_json::json;
 use sha2::{Digest, Sha256};
-use std::env;
-use std::fs::{read_to_string, DirBuilder, File, OpenOptions};
+use sqlx::types::Json;
 use std::io::Read;
 use std::io::{self, Write};
 
-#[put("/api/v1/crates/new")]
-pub async fn upload(body: Bytes) -> impl Responder {
-    match parse_crate(body.reader()) {
+#[put("/{name}/api/v1/crates/new")]
+pub async fn upload(
+    name: web::Path<String>,
+    body: Bytes,
+    state: web::Data<CargoRepository>,
+    storage_state: web::Data<Box<dyn Storage>>,
+) -> impl Responder {
+    let (crate_index, crate_file) = match parse_crate(body.reader()) {
+        Ok(res) => res,
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+    };
+
+    let repo = match state.get_repo_by_name(name.into_inner().as_str()).await {
+        Ok(repo) => repo,
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+    };
+
+    let crate_name = crate_index.name.clone();
+    let crate_path = format!("crates/{}_{}.crate", crate_name, crate_index.vers.clone());
+
+    match state
+        .add_index(Crate {
+            name: crate_name.clone(),
+            version: crate_index.vers.clone(),
+            index: Json(crate_index),
+            path: crate_path.clone(),
+            repo_id: repo.id,
+            _id: None,
+        })
+        .await
+    {
+        Ok(_) => {}
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+    };
+
+    match storage_state.save(crate_path, crate_file) {
         Ok(_) => {}
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
@@ -20,13 +55,32 @@ pub async fn upload(body: Bytes) -> impl Responder {
     HttpResponse::Ok().json(json!({}))
 }
 
-#[get("/crates/{name}/{version}/download")]
-pub async fn download(path: web::Path<(String, String)>) -> actix_web::Result<NamedFile> {
-    let crates_dir = env::var("CRATES_DIR").unwrap_or("crates".to_string());
+#[get("/{name}/crates/{crate_name}/{version}/download")]
+pub async fn download(
+    path: web::Path<(String, String, String)>,
+    state: web::Data<CargoRepository>,
+) -> actix_web::Result<NamedFile> {
+    let (name, crate_name, version) = path.into_inner();
 
-    let (name, version) = path.into_inner();
+    let repo = match state.get_repo_by_name(&name).await {
+        Ok(repo) => repo,
+        Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
+    };
 
-    let file = match NamedFile::open(format!("{}/{}_{}.crate", crates_dir, name, version)) {
+    let crate_index = match state
+        .get_index_by_name_id_and_version(&crate_name, &version, repo.id)
+        .await
+    {
+        Ok(index) => index,
+        Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
+    };
+
+    let crate_index = match crate_index {
+        None => return Err(actix_web::error::ErrorNotFound("crate not found")),
+        Some(index) => index,
+    };
+
+    let file = match NamedFile::open(crate_index.path) {
         Ok(file) => file,
         Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
     };
@@ -34,7 +88,7 @@ pub async fn download(path: web::Path<(String, String)>) -> actix_web::Result<Na
     Ok(file)
 }
 
-fn parse_crate<R: Read>(mut reader: R) -> Result<(), Error> {
+fn parse_crate<R: Read>(mut reader: R) -> Result<(CrateIndex, Vec<u8>), Error> {
     fn read_u32_le<R: Read>(reader: &mut R) -> io::Result<u32> {
         let mut buf = [0u8; 4];
         reader.read_exact(&mut buf)?;
@@ -57,28 +111,6 @@ fn parse_crate<R: Read>(mut reader: R) -> Result<(), Error> {
         }
     };
 
-    let dir_name = get_dir_name(&metadata.name);
-
-    DirBuilder::new()
-        .recursive(true)
-        .create(format!("assets/{}", &dir_name))?;
-
-    let mut metadata_file = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .append(true)
-        .open(format!("assets/{}/{}", &dir_name, metadata.name))?;
-
-    for line in read_to_string(format!("assets/{}/{}", &dir_name, metadata.name))?.lines() {
-        let crate_metadata: CrateIndex = serde_json::from_str(line)?;
-        if crate_metadata.vers == metadata.vers {
-            return Err(Error::VersionExists(format!(
-                "The version {} already exists",
-                metadata.vers
-            )));
-        }
-    }
-
     let crate_len = read_u32_le(&mut reader)? as usize;
 
     let mut crate_buffer = vec![0u8; crate_len];
@@ -91,23 +123,5 @@ fn parse_crate<R: Read>(mut reader: R) -> Result<(), Error> {
 
     let crate_index = CrateIndex::new_from_metadata(&metadata, checksum);
 
-    writeln!(metadata_file, "{}", serde_json::to_string(&crate_index)?)?;
-
-    let crates_dir = env::var("CRATES_DIR").unwrap_or("crates".to_string());
-
-    let mut crate_file = File::create(format!(
-        "{}/{}_{}.crate",
-        crates_dir, &metadata.name, &metadata.vers
-    ))?;
-
-    crate_file.write_all(crate_buffer.as_slice())?;
-
-    Ok(())
-}
-
-fn get_dir_name(crate_name: &str) -> String {
-    let first = &crate_name[0..2];
-    let second = &crate_name[2..4];
-
-    format!("{}/{}", first, second)
+    Ok((crate_index, crate_buffer))
 }
