@@ -1,5 +1,0 @@
-{
-  "dl": "http://localhost:6300/cargo/crates",
-  "api": "http://localhost:6300/cargo",
-  "auth-required": true
-}

@@ -7,7 +7,7 @@
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
 ARG RUST_VERSION=1.81.0
-ARG APP_NAME=shelf
+ARG APP_NAME=api
 
 ################################################################################
 # Create a stage for building the application.
@@ -27,15 +27,16 @@ RUN apk add --no-cache clang lld musl-dev git libressl-dev
 # Leverage a bind mount to the src directory to avoid having to copy the
 # source code into the container. Once built, copy the executable to an
 # output directory before the cache mounted /app/target is unmounted.
-RUN --mount=type=bind,source=src,target=src \
+RUN --mount=type=bind,source=api,target=api \
+    --mount=type=bind,source=migrator,target=migrator \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=cache,target=/app/target/ \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
 cargo build --locked --release && \
-cp ./target/release/$APP_NAME /bin/server
-
+cp ./target/release/$APP_NAME /bin/server && \
+cp ./target/release/migrator /bin/migrator
 ################################################################################
 # Create a new stage for running the application that contains the minimal
 # runtime dependencies for the application. This often uses a different base
@@ -50,6 +51,10 @@ FROM alpine:3 AS final
 
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
+COPY --from=build /bin/migrator /bin/
+COPY migrations /migrations
+
+ENV MIGRATIONS_DIR=/migrations
 
 # Expose the port that the application listens on.
 EXPOSE 6300
