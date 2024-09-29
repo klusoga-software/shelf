@@ -56,6 +56,7 @@ COPY migrations /migrations
 COPY dist /dist
 
 ENV MIGRATIONS_DIR=/migrations
+ENV UI_DIRECTORY=/dist
 
 # Expose the port that the application listens on.
 EXPOSE 6300
