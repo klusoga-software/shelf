@@ -13,5 +13,4 @@ pub fn api_scope() -> Scope{
     Scope::new("/api")
         .service(get_health)
         .service(repo_controller())
-        .service(get_cargo_scope())
 }

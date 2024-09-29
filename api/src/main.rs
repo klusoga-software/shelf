@@ -12,6 +12,7 @@ use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::path::Path;
+use crate::api::cargo::get_cargo_scope;
 
 mod error;
 
@@ -68,6 +69,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(auth))
             .app_data(web::Data::new(cargo_repository.clone()))
             .app_data(web::Data::new(storage))
+            .service(get_cargo_scope())
             .service(api_scope())
             .service(
                 actix_files::Files::new(
