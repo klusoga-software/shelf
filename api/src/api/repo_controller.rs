@@ -1,7 +1,9 @@
 use crate::api::models::CreateRepoRequest;
+use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::{Config, Repo};
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
+use log::error;
 use std::env;
 
 pub fn repo_controller() -> actix_web::Scope {
@@ -28,7 +30,7 @@ pub async fn create_repo(
         .await
     {
         Ok(id) => id,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     match state
@@ -41,7 +43,7 @@ pub async fn create_repo(
         .await
     {
         Ok(_) => HttpResponse::Created().finish(),
-        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => log_error_and_responde!(err),
     }
 }
 
@@ -49,7 +51,7 @@ pub async fn create_repo(
 pub async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
     match state.get_repos().await {
         Ok(repos) => HttpResponse::Ok().json(repos),
-        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => log_error_and_responde!(err),
     }
 }
 
@@ -59,11 +61,11 @@ pub async fn delete_repo(state: web::Data<CargoRepository>, id: web::Path<i32>) 
 
     match state.delete_config(&id).await {
         Ok(_) => {}
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     match state.delete_repo(&id).await {
         Ok(_) => HttpResponse::NoContent().finish(),
-        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => log_error_and_responde!(err),
     }
 }

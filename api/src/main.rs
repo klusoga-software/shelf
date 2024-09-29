@@ -62,6 +62,8 @@ async fn main() -> std::io::Result<()> {
             .service(get_health)
             .service(repo_controller())
             .service(get_cargo_scope())
+            .service(actix_files::Files::new("/assets", "./dist/assets").show_files_listing())
+            .service(actix_files::Files::new("/ui", "./dist").index_file("index.html"))
     })
     .bind(("0.0.0.0", 6300))?
     .run()
