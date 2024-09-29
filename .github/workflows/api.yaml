@@ -82,10 +82,13 @@ jobs:
           node-version: 20
 
       - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Build UI
         run: |
           cd shelf-ui
+          pnpm i
           pnpm run build
 
       - name: Build docker image
