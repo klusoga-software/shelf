@@ -3,7 +3,6 @@ use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::{Config, Repo};
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
-use log::error;
 use std::env;
 
 pub fn repo_controller() -> actix_web::Scope {
