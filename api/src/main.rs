@@ -5,6 +5,7 @@ use crate::repository::cargo_repository::CargoRepository;
 use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
 use crate::storage::Storage;
+use actix_cors::Cors;
 use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::middleware::{from_fn, Logger, Next};
@@ -59,6 +60,12 @@ async fn main() -> std::io::Result<()> {
         let ui_directory = env::var("UI_DIRECTORY").unwrap_or("./dist".to_string());
 
         App::new()
+            .wrap(
+                Cors::default()
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin(),
+            )
             .wrap(Logger::default())
             .wrap(from_fn(auth))
             .app_data(web::Data::new(cargo_repository.clone()))

@@ -11,12 +11,13 @@ function App() {
     <>
       <TopNavigation identity={{ href: "ui", title: "Shelf" }}></TopNavigation>
       <AppLayout
+          contentType={"dashboard"}
         navigation={
             <Sidenav/>
         }
         content={
             <Routes>
-                <Route path="repos" element={<ReposPage/>}/>
+                <Route path="/ui/repos" element={<ReposPage/>}/>
             </Routes>
         }
       ></AppLayout>
