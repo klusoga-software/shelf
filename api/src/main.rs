@@ -11,6 +11,8 @@ use actix_web::middleware::{from_fn, Logger, Next};
 use actix_web::{web, App, Error, HttpServer};
 use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
+use std::env;
+use std::path::Path;
 
 mod error;
 
@@ -54,6 +56,8 @@ async fn main() -> std::io::Result<()> {
             _ => panic!("None storage type matches. Please specify one of [LOCAL, S3]"),
         };
 
+        let ui_directory = env::var("UI_DIRECTORY").unwrap_or("./dist".to_string());
+
         App::new()
             .wrap(Logger::default())
             .wrap(from_fn(auth))
@@ -62,8 +66,18 @@ async fn main() -> std::io::Result<()> {
             .service(get_health)
             .service(repo_controller())
             .service(get_cargo_scope())
-            .service(actix_files::Files::new("/assets", "/dist/assets").show_files_listing())
-            .service(actix_files::Files::new("/ui", "/dist").index_file("index.html"))
+            .service(
+                actix_files::Files::new(
+                    "/assets",
+                    Path::new(&ui_directory)
+                        .join("assets")
+                        .to_str()
+                        .unwrap()
+                        .to_string(),
+                )
+                .show_files_listing(),
+            )
+            .service(actix_files::Files::new("/ui", ui_directory).index_file("index.html"))
     })
     .bind(("0.0.0.0", 6300))?
     .run()
