@@ -17,7 +17,7 @@ function App() {
         }
         content={
             <Routes>
-                <Route path="/ui/repos" element={<ReposPage/>}/>
+                <Route path="/repos" element={<ReposPage/>}/>
             </Routes>
         }
       ></AppLayout>

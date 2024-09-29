@@ -1,6 +1,4 @@
-use crate::api::cargo::get_cargo_scope;
-use crate::api::health_controller::get_health;
-use crate::api::repo_controller::repo_controller;
+use crate::api::api_scope;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
@@ -70,9 +68,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(auth))
             .app_data(web::Data::new(cargo_repository.clone()))
             .app_data(web::Data::new(storage))
-            .service(get_health)
-            .service(repo_controller())
-            .service(get_cargo_scope())
+            .service(api_scope())
             .service(
                 actix_files::Files::new(
                     "/assets",
@@ -84,7 +80,7 @@ async fn main() -> std::io::Result<()> {
                 )
                 .show_files_listing(),
             )
-            .service(actix_files::Files::new("/ui", ui_directory).index_file("index.html"))
+            .service(actix_files::Files::new("/{all}*", ui_directory).index_file("index.html"))
     })
     .bind(("0.0.0.0", 6300))?
     .run()
