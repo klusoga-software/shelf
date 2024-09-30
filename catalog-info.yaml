@@ -2,12 +2,39 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: shelf
-  description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
 spec:
   type: website
-  owner: flokludass@gmail.com
+  owner: admins
   lifecycle: experimental
+  dependsOn:
+    - resource:default/shelf-db
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: shelf-db
+  description: Stores artifacts
+spec:
+  type: database
+  owner: admins
+  system: shelf
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: shelf
+spec:
+  owner: admins
+  domain: shelf
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: shelf
+spec:
+  owner: admins
