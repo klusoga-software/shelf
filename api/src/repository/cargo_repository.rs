@@ -13,6 +13,22 @@ impl CargoRepository {
         Self { pool }
     }
 
+    pub async fn list_crates_for_repo(&self, repo_id: i32) -> Result<Vec<Crate>, Error> {
+        sqlx::query_as::<_, Crate>(
+            r#"SELECT id, name, path, version, repo_id, index from crates where repo_id = $1"#,
+        )
+        .bind(repo_id)
+        .fetch_all(&self.pool)
+        .await
+    }
+
+    pub async fn delete_crate(&self, crate_id: i32) -> Result<PgQueryResult, Error> {
+        sqlx::query(r#"delete from crates where id = $1"#)
+            .bind(crate_id)
+            .execute(&self.pool)
+            .await
+    }
+
     pub async fn get_repos(&self) -> Result<Vec<Repo>, Error> {
         sqlx::query_as::<_, Repo>("select id, name, repo_type, public from repos")
             .fetch_all(&self.pool)

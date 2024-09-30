@@ -5,6 +5,7 @@ import {
 import {Route, Routes} from "react-router-dom";
 import ReposPage from "./pages/ReposPage.tsx";
 import Sidenav from "./components/Sidenav.tsx";
+import CratesPage from "./pages/CratesPage.tsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         content={
             <Routes>
                 <Route path="/repos" element={<ReposPage/>}/>
+                <Route path="/crates/:id" element={<CratesPage/>}/>
             </Routes>
         }
       ></AppLayout>

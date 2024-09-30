@@ -1,4 +1,5 @@
 use crate::api::api_scope;
+use crate::api::cargo::get_cargo_scope;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
@@ -12,7 +13,6 @@ use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::path::Path;
-use crate::api::cargo::get_cargo_scope;
 
 mod error;
 

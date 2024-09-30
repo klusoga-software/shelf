@@ -7,6 +7,7 @@ import {
   FormField,
   Header,
   Input,
+  Link,
   Modal,
   Select,
   SelectProps,
@@ -14,6 +15,7 @@ import {
   Table,
   Toggle,
 } from "@cloudscape-design/components";
+import { useNavigate } from "react-router-dom";
 
 function ReposPage() {
   const [repos, setRepos] = useState<Repo[]>([]);
@@ -27,6 +29,7 @@ function ReposPage() {
 
   const selectOptions = [{ value: "Cargo" }];
   const [selectedRepo, setSelectedRepo] = useState<Repo[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     load_repos();
@@ -125,7 +128,19 @@ function ReposPage() {
           {
             id: "id",
             header: "ID",
-            cell: (repo) => repo.id,
+            cell: (repo) => (
+              <Link
+                onFollow={(e) => {
+                  e.preventDefault();
+                  switch (repo.repo_type) {
+                    case "Cargo":
+                      navigate(`/crates/${repo.id}`);
+                  }
+                }}
+              >
+                {repo.id}
+              </Link>
+            ),
             sortingField: "id",
           },
           { id: "name", header: "Name", cell: (repo) => repo.name },

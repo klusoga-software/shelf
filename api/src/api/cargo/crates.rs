@@ -40,7 +40,7 @@ pub async fn upload(
             index: Json(crate_index),
             path: crate_path.clone(),
             repo_id: repo.id.unwrap(),
-            _id: None,
+            id: None,
         })
         .await
     {
