@@ -14,8 +14,10 @@
     "@cloudscape-design/components": "^3.0.773",
     "@cloudscape-design/global-styles": "^1.0.32",
     "axios": "^1.7.7",
+    "oidc-client-ts": "^3.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-oidc-context": "^3.1.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
