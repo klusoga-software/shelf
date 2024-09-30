@@ -18,3 +18,4 @@ Supported Packages:
 | DATABASE_URL | The url to the postgres database                                                   | postgres://postgres:password@localhost/postgres |
 | RUST_LOG     | The log level you want to use                                                      | info                                            |
 | BASE_URL     | The url on which this application is reachable                                     | http://localhost:6300                           |
+| CONFIG_PATH  | The path to the config file                                                        | ./config.toml                                   |
