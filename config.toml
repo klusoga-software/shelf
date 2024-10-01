@@ -1,2 +1,2 @@
 [ui]
-authority = "https://auth.service-klusoga.de/auth/realms/shelf"
+authority = "http://localhost:8080"

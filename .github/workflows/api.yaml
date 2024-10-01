@@ -1,11 +1,13 @@
 name: Build
 on:
   push:
+    branches:
+      - main
+      - develop
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   IMAGE: registry.service-klusoga.de/shelf/shelf
-  UI_IMAGE: registry.service-klusoga.de/shelf/shelf-ui
 
 jobs:
   tag:
