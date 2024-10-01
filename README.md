@@ -19,3 +19,29 @@ Supported Packages:
 | RUST_LOG     | The log level you want to use                                                      | info                                            |
 | BASE_URL     | The url on which this application is reachable                                     | http://localhost:6300                           |
 | CONFIG_PATH  | The path to the config file                                                        | ./config.toml                                   |
+
+## How to setup:
+
+1. Provide a postgres database or use the included docker compose file to spin up a postgres database
+2. Run the following command to run the migrator. The migrator will run all sql migrations:
+```shell
+cargo run --bin migrator
+```
+
+3. Currently, you need to use a oidc authentication server to use this software. So you need to insert a valid authority inside the config.toml file
+4. To start the api run:
+```shell
+cargo run --bin api
+```
+
+5. To start the ui run the following commands:
+```shell
+# Navigate to the ui directory
+cd shelf-ui
+
+# Install packages
+pnpm i
+
+# Start the ui
+pnpm dev
+```
