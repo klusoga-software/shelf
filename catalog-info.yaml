@@ -2,6 +2,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: shelf
+  annotations:
+    github.com/project-slug: 'klusoga-software/shelf'
 spec:
   type: website
   owner: admins
