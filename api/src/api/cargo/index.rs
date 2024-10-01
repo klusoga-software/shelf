@@ -1,4 +1,5 @@
 use crate::api::cargo::models::IndexConfig;
+use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use actix_web::http::header::ContentType;
 use actix_web::web::Path;
@@ -39,15 +40,15 @@ pub async fn index_files(
 
     let repo = match state.get_repo_by_name(name.as_str()).await {
         Ok(repo) => repo,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     let crate_index = match state
-        .get_index_by_name_and_id(crate_name, repo.id.unwrap())
+        .get_index_by_name_and_id(crate_name, &repo.id.unwrap())
         .await
     {
         Ok(index) => index,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     let mut index_response = String::new();
@@ -55,7 +56,7 @@ pub async fn index_files(
     for index in crate_index {
         let index_json = match serde_json::to_string(&index.index) {
             Ok(json) => json,
-            Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+            Err(err) => return log_error_and_responde!(err),
         };
 
         index_response.push_str(&index_json);

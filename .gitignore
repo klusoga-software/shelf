@@ -4,3 +4,5 @@
 crates/
 
 assets/**/*
+
+dist/

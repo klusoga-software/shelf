@@ -53,8 +53,10 @@ FROM alpine:3 AS final
 COPY --from=build /bin/server /bin/
 COPY --from=build /bin/migrator /bin/
 COPY migrations /migrations
+COPY dist /dist
 
 ENV MIGRATIONS_DIR=/migrations
+ENV UI_DIRECTORY=/dist
 
 # Expose the port that the application listens on.
 EXPOSE 6300

@@ -1,5 +1,6 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
 use crate::error::Error;
+use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::Crate;
 use crate::storage::Storage;
@@ -21,12 +22,12 @@ pub async fn upload(
 ) -> impl Responder {
     let (crate_index, crate_file) = match parse_crate(body.reader()) {
         Ok(res) => res,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     let repo = match state.get_repo_by_name(name.into_inner().as_str()).await {
         Ok(repo) => repo,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     let crate_name = crate_index.name.clone();
@@ -39,17 +40,17 @@ pub async fn upload(
             index: Json(crate_index),
             path: crate_path.clone(),
             repo_id: repo.id.unwrap(),
-            _id: None,
+            id: None,
         })
         .await
     {
         Ok(_) => {}
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     match storage_state.save(crate_path, crate_file) {
         Ok(_) => {}
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
+        Err(err) => return log_error_and_responde!(err),
     };
 
     HttpResponse::Ok().json(json!({}))
@@ -68,7 +69,7 @@ pub async fn download(
     };
 
     let crate_index = match state
-        .get_index_by_name_id_and_version(&crate_name, &version, repo.id.unwrap())
+        .get_index_by_name_id_and_version(&crate_name, &version, &repo.id.unwrap())
         .await
     {
         Ok(index) => index,

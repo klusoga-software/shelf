@@ -12,10 +12,8 @@ pub enum RepositoryType {
 pub struct Config {
     pub api: String,
     pub dl: String,
-    #[sqlx(rename = "id")]
-    pub _id: i32,
-    #[sqlx(rename = "repo_id")]
-    pub _repo_id: i32,
+    pub id: Option<i32>,
+    pub repo_id: i32,
 }
 
 #[derive(sqlx::FromRow, Serialize)]
@@ -26,10 +24,9 @@ pub struct Repo {
     pub public: bool,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(sqlx::FromRow, Serialize)]
 pub struct Crate {
-    #[sqlx(rename = "id")]
-    pub _id: Option<i32>,
+    pub id: Option<i32>,
     pub name: String,
     pub path: String,
     pub version: String,

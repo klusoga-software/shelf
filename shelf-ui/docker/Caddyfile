@@ -1,0 +1,7 @@
+http://:80 {
+    handle_path /ui/* {
+        root * /var/www/shelf
+        try_files {path} /index.html
+        file_server
+    }
+}
