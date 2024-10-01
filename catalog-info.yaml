@@ -7,6 +7,7 @@ metadata:
 spec:
   type: website
   owner: admins
+  system: shelf
   lifecycle: experimental
   dependsOn:
     - resource:default/shelf-db
