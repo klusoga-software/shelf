@@ -23,6 +23,7 @@ function Sidenav() {
       items={[
         { type: "link", text: "Dashboard", href: "/" },
         { type: "link", text: "Repos", href: "/repos" },
+        { type: "link", text: "Service Accounts", href: "/service-accounts" },
       ]}
     />
   );

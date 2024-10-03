@@ -13,7 +13,7 @@ pub fn repo_controller() -> actix_web::Scope {
 }
 
 #[post("")]
-pub async fn create_repo(
+async fn create_repo(
     state: web::Data<CargoRepository>,
     repo: web::Json<CreateRepoRequest>,
 ) -> impl Responder {
@@ -47,7 +47,7 @@ pub async fn create_repo(
 }
 
 #[get("")]
-pub async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
+async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
     match state.get_repos().await {
         Ok(repos) => HttpResponse::Ok().json(repos),
         Err(err) => log_error_and_responde!(err),
@@ -55,7 +55,7 @@ pub async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
 }
 
 #[delete("/{id}")]
-pub async fn delete_repo(state: web::Data<CargoRepository>, id: web::Path<i32>) -> impl Responder {
+async fn delete_repo(state: web::Data<CargoRepository>, id: web::Path<i32>) -> impl Responder {
     let id = id.into_inner();
 
     match state.delete_config(&id).await {

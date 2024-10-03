@@ -1,4 +1,5 @@
 use crate::api::cargo::models::CrateIndex;
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 
@@ -16,7 +17,7 @@ pub struct Config {
     pub repo_id: i32,
 }
 
-#[derive(sqlx::FromRow, Serialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct Repo {
     pub id: Option<i32>,
     pub name: String,
@@ -24,7 +25,7 @@ pub struct Repo {
     pub public: bool,
 }
 
-#[derive(sqlx::FromRow, Serialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct Crate {
     pub id: Option<i32>,
     pub name: String,
@@ -32,4 +33,14 @@ pub struct Crate {
     pub version: String,
     pub repo_id: i32,
     pub index: Json<CrateIndex>,
+}
+
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
+pub struct ServiceAccount {
+    pub id: Option<i32>,
+    pub name: String,
+    pub created_at: DateTime<chrono::Utc>,
+    pub updated_at: DateTime<chrono::Utc>,
+    pub expires_at: Option<DateTime<chrono::Utc>>,
+    pub repo_count: i64,
 }

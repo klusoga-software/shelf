@@ -8,6 +8,7 @@ import Sidenav from "./components/Sidenav.tsx";
 import CratesPage from "./pages/CratesPage.tsx";
 import {useEffect, useState} from "react";
 import {hasAuthParams, useAuth} from "react-oidc-context";
+import ServiceAccountsPage from "./pages/ServiceAccountsPage.tsx";
 
 function App() {
     const auth = useAuth();
@@ -41,6 +42,7 @@ function App() {
             <Routes>
                 <Route path="/repos" element={<ReposPage/>}/>
                 <Route path="/crates/:id" element={<CratesPage/>}/>
+                <Route path="/service-accounts" element={<ServiceAccountsPage/>}/>
             </Routes>
         }
       ></AppLayout>
