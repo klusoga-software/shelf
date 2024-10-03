@@ -2,6 +2,7 @@ use crate::api::api_scope;
 use crate::api::cargo::get_cargo_scope;
 use crate::configuration::Configuration;
 use crate::repository::cargo_repository::CargoRepository;
+use crate::repository::role_repository::RoleRepository;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
 use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
@@ -48,6 +49,7 @@ async fn main() -> std::io::Result<()> {
 
     let cargo_repository = CargoRepository::new(pool.clone());
     let service_account_repository = ServiceAccountsRepository::new(pool.clone());
+    let role_repository = RoleRepository::new(pool.clone());
 
     HttpServer::new(move || {
         let storage: Box<dyn Storage> = match std::env::var("STORAGE_TYPE")
@@ -74,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(auth))
             .app_data(web::Data::new(cargo_repository.clone()))
             .app_data(web::Data::new(service_account_repository.clone()))
+            .app_data(web::Data::new(role_repository.clone()))
             .app_data(web::Data::new(storage))
             .app_data(web::Data::new(load_configuration()))
             .service(get_cargo_scope())

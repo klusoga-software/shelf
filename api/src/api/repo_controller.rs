@@ -6,7 +6,7 @@ use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use std::env;
 
 pub fn repo_controller() -> actix_web::Scope {
-    web::scope("/repo")
+    web::scope("/repos")
         .service(create_repo)
         .service(get_repos)
         .service(delete_repo)
