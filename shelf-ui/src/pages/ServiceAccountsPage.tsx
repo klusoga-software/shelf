@@ -39,20 +39,47 @@ function ServiceAccountsPage() {
     useState<Map<string, SelectProps.Option>>();
 
   useEffect(() => {
-    setLoading(true);
     load_service_accounts();
     load_roles();
     load_repos();
   }, []);
 
   function load_service_accounts() {
+    setLoading(true);
     axios.get("/api/service-accounts").then((response) => {
       setServiceAccounts(response.data);
       setLoading(false);
     });
   }
-  function delete_service_account() {}
-  function create_service_account() {}
+  function delete_service_account() {
+    for (const sa of selectedServiceAccounts) {
+      axios.delete(`/api/service-accounts/${sa.id}`).then(() => {
+        load_service_accounts();
+      });
+    }
+  }
+  function create_service_account() {
+    const mapping: [number, number][] = [];
+
+    selectedRole.forEach((value, key) => {
+      mapping.push([parseInt(key), parseInt(value.value)]);
+    });
+
+    axios
+      .post("/api/service-accounts", {
+        name: name,
+        repo_list: mapping,
+        expired_at: noExpiration ? null : expiration,
+      })
+      .then(() => {
+        setName("");
+        setExpiration("");
+        setSelectedRole(new Map());
+        setSelectedRepos([]);
+        setShowModal(false);
+        load_service_accounts();
+      });
+  }
 
   function load_roles() {
     axios.get<Role[]>("/api/roles").then((response) => {
@@ -128,7 +155,10 @@ function ServiceAccountsPage() {
             <FormField label="Expiration">
               <DatePicker
                 disabled={noExpiration}
-                onChange={({ detail }) => setExpiration(detail.value)}
+                onChange={({ detail }) => {
+                  let date = new Date(detail.value);
+                  setExpiration(date.toISOString());
+                }}
                 value={expiration}
               ></DatePicker>
             </FormField>
