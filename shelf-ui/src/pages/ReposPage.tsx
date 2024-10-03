@@ -37,7 +37,7 @@ function ReposPage() {
 
   function load_repos() {
     setLoading(true);
-    axios.get("/api/repo").then((response) => {
+    axios.get("/api/repos").then((response) => {
       setRepos(response.data);
       setLoading(false);
     });
@@ -45,7 +45,7 @@ function ReposPage() {
 
   function create_repo() {
     axios
-      .post("/api/repo", {
+      .post("/api/repos", {
         name: repoName,
         repo_type: repoType.value,
         public: repoPublic,
@@ -61,7 +61,7 @@ function ReposPage() {
 
   function delete_repos() {
     for (const repo of selectedRepo) {
-      axios.delete(`/api/repo/${repo.id}`).then(() => {
+      axios.delete(`/api/repos/${repo.id}`).then(() => {
         setSelectedRepo([]);
         load_repos();
       });

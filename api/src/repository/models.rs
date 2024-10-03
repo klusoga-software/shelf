@@ -44,3 +44,10 @@ pub struct ServiceAccount {
     pub expires_at: Option<DateTime<chrono::Utc>>,
     pub repo_count: i64,
 }
+
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
+pub struct Role {
+    pub id: Option<i32>,
+    pub name: String,
+    pub permissions: String,
+}
