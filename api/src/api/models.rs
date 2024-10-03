@@ -23,6 +23,5 @@ pub struct CreateRepoRequest {
 pub struct CreateServiceAccount {
     pub name: String,
     pub expired_at: Option<DateTime<Utc>>,
-    pub key: String,
     pub repo_list: Vec<(i32, i32)>,
 }

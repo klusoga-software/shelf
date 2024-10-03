@@ -38,12 +38,11 @@ group by sa.id"#,
         let tx = self.pool.begin().await?;
 
         let result = sqlx::query(
-            r#"insert into service_accounts (name, expires_at, key, secret)
-values ($1, $2, $3, $4) returning id"#,
+            r#"insert into service_accounts (name, expires_at, secret)
+values ($1, $2, $3) returning id"#,
         )
         .bind(account.name)
         .bind(account.expired_at)
-        .bind(account.key)
         .bind(secret)
         .fetch_one(&self.pool)
         .await?;
@@ -58,6 +57,23 @@ values ($1, $2, $3, $4) returning id"#,
                 .execute(&self.pool).await?;
         }
 
+        tx.commit().await?;
+
+        Ok(())
+    }
+
+    pub async fn delete_service_account(&self, account_id: i32) -> Result<(), Error> {
+        let tx = self.pool.begin().await?;
+
+        sqlx::query(r#"delete from service_accounts_repos where service_account_id = $1"#)
+            .bind(account_id)
+            .execute(&self.pool)
+            .await?;
+
+        sqlx::query(r#"delete from service_accounts where id = $1"#)
+            .bind(account_id)
+            .execute(&self.pool)
+            .await?;
         tx.commit().await?;
 
         Ok(())
