@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod database_tests {
-    use std::path::Path;
     use sqlx::migrate::Migrator;
-    use sqlx::Pool;
     use sqlx::postgres::PgPoolOptions;
-    use testcontainers::ContainerAsync;
+    use sqlx::Pool;
+    use std::path::Path;
     use testcontainers::runners::AsyncRunner;
+    use testcontainers::ContainerAsync;
     use testcontainers_modules::postgres::Postgres;
 
     async fn build_postgres_database() -> ContainerAsync<Postgres> {
@@ -17,15 +17,21 @@ mod database_tests {
             .await
             .expect("Failed to migrate");
 
-        migrator.run(db_pool).await.expect("Failed to run migrations");
+        migrator
+            .run(db_pool)
+            .await
+            .expect("Failed to run migrations");
     }
 
     #[tokio::test]
-    async fn test_migrations(){
+    async fn test_migrations() {
         let postgres = build_postgres_database().await;
-        
-        let port = postgres.get_host_port_ipv4(5432).await.expect("Failed to get port");
-        
+
+        let port = postgres
+            .get_host_port_ipv4(5432)
+            .await
+            .expect("Failed to get port");
+
         let pool = PgPoolOptions::new()
             .max_connections(10)
             .connect(format!("postgres://postgres:postgres@localhost:{}/postgres", port).as_str())

@@ -3,6 +3,10 @@ use crate::log_error_and_responde;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
 use actix_web::web::Json;
 use actix_web::{delete, get, post, web, HttpResponse, Responder, Scope};
+use bcrypt::{hash, DEFAULT_COST};
+use rand::distributions::Alphanumeric;
+use rand::Rng;
+use serde_json::json;
 
 pub fn service_account_controller() -> Scope {
     Scope::new("/service-accounts")
@@ -24,13 +28,22 @@ async fn create_service_account(
     state: web::Data<ServiceAccountsRepository>,
     body: Json<CreateServiceAccount>,
 ) -> impl Responder {
-    let secret: String = "secret".to_string();
+    let secret: String = rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(12)
+        .map(char::from)
+        .collect();
+
+    let hashed = match hash(secret.clone(), DEFAULT_COST) {
+        Ok(hash) => hash,
+        Err(err) => return log_error_and_responde!(err),
+    };
 
     match state
-        .create_service_account(body.into_inner(), &secret)
+        .create_service_account(body.into_inner(), &hashed)
         .await
     {
-        Ok(_) => HttpResponse::Created().finish(),
+        Ok(_) => HttpResponse::Created().json(json!({"secret": secret})),
         Err(err) => log_error_and_responde!(err),
     }
 }

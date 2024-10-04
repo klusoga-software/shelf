@@ -17,6 +17,8 @@ sqlx = {version = "0.8.2", features = ["runtime-tokio", "postgres", "json", "chr
 chrono = {version = "0.4.38", features = ["serde"]}
 actix-cors = "0.7.0"
 toml = "0.8.19"
+bcrypt = "0.15.1"
+rand = "0.8.5"
 
 [dev-dependencies]
 testcontainers = "0.23.1"
