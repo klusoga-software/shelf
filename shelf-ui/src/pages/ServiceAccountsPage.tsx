@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CopyToClipboard,
   DatePicker,
   FormField,
   Header,
@@ -38,6 +39,9 @@ function ServiceAccountsPage() {
   const [selectedRole, setSelectedRole] =
     useState<Map<string, SelectProps.Option>>();
 
+  const [showSecretModal, setShowSecretModal] = useState(false);
+  const [secret, setSecret] = useState("");
+
   useEffect(() => {
     load_service_accounts();
     load_roles();
@@ -71,8 +75,9 @@ function ServiceAccountsPage() {
         repo_list: mapping,
         expired_at: noExpiration ? null : expiration,
       })
-      .then(() => {
-        setName("");
+      .then((response) => {
+        setSecret(response.data.secret);
+        setShowSecretModal(true);
         setExpiration("");
         setSelectedRole(new Map());
         setSelectedRepos([]);
@@ -128,6 +133,29 @@ function ServiceAccountsPage() {
 
   return (
     <>
+      <Modal
+        visible={showSecretModal}
+        onDismiss={() => setShowSecretModal(false)}
+        header="Service Account Credentials"
+        footer={
+          <Box>
+            <SpaceBetween size="xs" direction="horizontal">
+              <Button onClick={() => setShowSecretModal(false)}>Ok</Button>
+            </SpaceBetween>
+          </Box>
+        }
+      >
+        <SpaceBetween size="m">
+          <FormField label="Secret">
+            <CopyToClipboard
+              variant="inline"
+              textToCopy={secret}
+              copySuccessText="Secret copied"
+              copyErrorText="Error while copy secret"
+            ></CopyToClipboard>
+          </FormField>
+        </SpaceBetween>
+      </Modal>
       <Modal
         header="Create Service Account"
         onDismiss={() => setShowModal(false)}

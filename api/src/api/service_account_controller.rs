@@ -30,7 +30,7 @@ async fn create_service_account(
 ) -> impl Responder {
     let secret: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
-        .take(12)
+        .take(24)
         .map(char::from)
         .collect();
 
