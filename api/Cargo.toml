@@ -21,5 +21,4 @@ bcrypt = "0.15.1"
 rand = "0.8.5"
 
 [dev-dependencies]
-testcontainers = "0.23.1"
-testcontainers-modules = {version = "0.11.2", features = ["postgres"]}
+test-helpers = {version = "0.1.0", path = "../test_helpers"}

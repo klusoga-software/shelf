@@ -362,8 +362,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
- "testcontainers",
- "testcontainers-modules",
+ "test-helpers",
  "tokio",
  "toml",
 ]
@@ -2726,6 +2725,15 @@ dependencies = [
  "once_cell",
  "rustix",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "test-helpers"
+version = "0.1.0"
+dependencies = [
+ "sqlx",
+ "testcontainers",
+ "testcontainers-modules",
 ]
 
 [[package]]
