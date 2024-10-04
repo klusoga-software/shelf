@@ -18,7 +18,7 @@ pub fn service_account_controller() -> Scope {
 #[get("")]
 async fn list_service_accounts(state: web::Data<ServiceAccountsRepository>) -> impl Responder {
     match state.list_service_accounts().await {
-        Ok(repos) => HttpResponse::Ok().json(repos),
+        Ok(service_accounts) => HttpResponse::Ok().json(service_accounts),
         Err(err) => log_error_and_responde!(err),
     }
 }
