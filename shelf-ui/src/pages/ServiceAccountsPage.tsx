@@ -117,7 +117,8 @@ function ServiceAccountsPage() {
               })
             }
             options={roles}
-            selectedOption={selectedRole!.get(repo.value!)!}
+            // @ts-expect-error TODO: will be fixed later
+            selectedOption={selectedRole?.get(repo.value!)}
           ></Select>
         </FormField>,
       );
