@@ -23,7 +23,7 @@ async fn create_repo(
         .create_repo(Repo {
             id: None,
             name: repo.name.clone(),
-            public: false,
+            public: repo.public,
             repo_type: repo.repo_type.clone(),
         })
         .await
