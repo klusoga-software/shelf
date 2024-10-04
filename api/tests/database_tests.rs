@@ -22,10 +22,13 @@ mod database_tests {
 
     #[tokio::test]
     async fn test_migrations(){
-        let _postgres = build_postgres_database().await;
+        let postgres = build_postgres_database().await;
+        
+        let port = postgres.get_host_port_ipv4(5432).await.expect("Failed to get port");
+        
         let pool = PgPoolOptions::new()
             .max_connections(10)
-            .connect("postgres://postgres:password@localhost/postgres")
+            .connect(format!("postgres://postgres:postgres@localhost:{}/postgres", port).as_str())
             .await
             .expect("Failed to connect to database");
 
