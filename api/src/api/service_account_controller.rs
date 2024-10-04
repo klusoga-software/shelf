@@ -3,7 +3,6 @@ use crate::log_error_and_responde;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
 use actix_web::web::Json;
 use actix_web::{delete, get, post, web, HttpResponse, Responder, Scope};
-use sqlx::Error;
 
 pub fn service_account_controller() -> Scope {
     Scope::new("/service-accounts")

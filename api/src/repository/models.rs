@@ -13,6 +13,7 @@ pub enum RepositoryType {
 pub struct Config {
     pub api: String,
     pub dl: String,
+    #[allow(dead_code)]
     pub id: Option<i32>,
     pub repo_id: i32,
 }
