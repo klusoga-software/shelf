@@ -61,8 +61,8 @@ function ServiceAccountsPage() {
   function create_service_account() {
     const mapping: [number, number][] = [];
 
-    selectedRole.forEach((value, key) => {
-      mapping.push([parseInt(key), parseInt(value.value)]);
+    selectedRole!.forEach((value, key) => {
+      mapping.push([parseInt(key), parseInt(value.value as string)]);
     });
 
     axios
@@ -117,7 +117,7 @@ function ServiceAccountsPage() {
               })
             }
             options={roles}
-            selectedOption={selectedRole?.get(repo.value!)}
+            selectedOption={selectedRole!.get(repo.value!)!}
           ></Select>
         </FormField>,
       );
@@ -156,7 +156,7 @@ function ServiceAccountsPage() {
               <DatePicker
                 disabled={noExpiration}
                 onChange={({ detail }) => {
-                  let date = new Date(detail.value);
+                  const date = new Date(detail.value);
                   setExpiration(date.toISOString());
                 }}
                 value={expiration}
