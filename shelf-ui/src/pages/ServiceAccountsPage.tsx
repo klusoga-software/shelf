@@ -8,7 +8,6 @@ import {
   FormField,
   Header,
   Input,
-  Link,
   Modal,
   Multiselect,
   Select,
@@ -245,15 +244,7 @@ function ServiceAccountsPage() {
           {
             id: "id",
             header: "ID",
-            cell: (sa) => (
-              <Link
-                onFollow={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                {sa.id}
-              </Link>
-            ),
+            cell: (sa) => sa.id,
             sortingField: "id",
           },
           { id: "name", header: "Name", cell: (sa) => sa.name },
