@@ -1,12 +1,13 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
-use crate::error::Error;
+use crate::auth::check_auth;
+use crate::error::{AuthError, Error};
 use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::Crate;
 use crate::storage::Storage;
 use actix_files::NamedFile;
 use actix_web::web::{Buf, Bytes};
-use actix_web::{get, put, web, HttpResponse, Responder};
+use actix_web::{get, put, web, HttpRequest, HttpResponse, Responder};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use sqlx::types::Json;
@@ -19,7 +20,19 @@ pub async fn upload(
     body: Bytes,
     state: web::Data<CargoRepository>,
     storage_state: web::Data<Box<dyn Storage>>,
+    req: HttpRequest,
 ) -> impl Responder {
+    match check_auth(req, "W".to_string()).await {
+        Ok(_) => {}
+        Err(err) => match err {
+            AuthError::Unauthorized(message) => return HttpResponse::Unauthorized().body(message),
+            AuthError::ActixDataMissing(message) => {
+                return HttpResponse::InternalServerError().body(message)
+            }
+            AuthError::RepositoryNotFound(repo) => return HttpResponse::NotFound().body(repo),
+        },
+    }
+
     let (crate_index, crate_file) = match parse_crate(body.reader()) {
         Ok(res) => res,
         Err(err) => return log_error_and_responde!(err),

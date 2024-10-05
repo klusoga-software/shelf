@@ -34,3 +34,26 @@ impl Display for Error {
         }
     }
 }
+
+#[derive(Debug)]
+pub enum AuthError {
+    Unauthorized(String),
+    ActixDataMissing(String),
+    RepositoryNotFound(String),
+}
+
+impl Display for AuthError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AuthError::Unauthorized(err) => {
+                write!(f, "Unauthorized: {}", err)
+            }
+            AuthError::ActixDataMissing(err) => {
+                write!(f, "Actix Data Missing: {}", err)
+            }
+            AuthError::RepositoryNotFound(name) => {
+                write!(f, "Repository not found: {}", name)
+            }
+        }
+    }
+}

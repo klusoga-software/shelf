@@ -32,22 +32,20 @@ group by sa.id"#,
 
     pub async fn create_service_account(
         &self,
-        account: CreateServiceAccount,
-        secret: &String,
-    ) -> Result<(), Error> {
+        account: &CreateServiceAccount,
+    ) -> Result<i32, Error> {
         let tx = self.pool.begin().await?;
 
         let result = sqlx::query(
-            r#"insert into service_accounts (name, expires_at, secret)
-values ($1, $2, $3) returning id"#,
+            r#"insert into service_accounts (name, expires_at)
+values ($1, $2) returning id"#,
         )
-        .bind(account.name)
+        .bind(&account.name)
         .bind(account.expired_at)
-        .bind(secret)
         .fetch_one(&self.pool)
         .await?;
 
-        for repo in account.repo_list {
+        for repo in &account.repo_list {
             let account_id: i32 = result.get("id");
 
             sqlx::query(r#"insert into service_accounts_repos (repo_id, service_account_id, role_id) VALUES ($1, $2, $3)"#)
@@ -59,7 +57,7 @@ values ($1, $2, $3) returning id"#,
 
         tx.commit().await?;
 
-        Ok(())
+        Ok(result.get("id"))
     }
 
     pub async fn delete_service_account(&self, account_id: i32) -> Result<(), Error> {
@@ -77,5 +75,29 @@ values ($1, $2, $3) returning id"#,
         tx.commit().await?;
 
         Ok(())
+    }
+
+    pub async fn get_permissions(
+        &self,
+        service_account_id: i32,
+        repo_id: i32,
+    ) -> Result<String, Error> {
+        let row = sqlx::query(
+            r#"
+SELECT r.permissions
+FROM service_accounts sa
+         JOIN service_accounts_repos sar ON sa.id = sar.service_account_id
+         JOIN Roles r ON sar.role_id = r.id
+WHERE sa.id = $1
+  AND sar.repo_id = $2;        
+        "#,
+        )
+        .bind(service_account_id)
+        .bind(repo_id)
+        .fetch_one(&self.pool)
+        .await?;
+
+        let permissions: String = row.try_get("permissions")?;
+        Ok(permissions)
     }
 }

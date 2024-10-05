@@ -19,6 +19,7 @@ actix-cors = "0.7.0"
 toml = "0.8.19"
 bcrypt = "0.15.1"
 rand = "0.8.5"
+jsonwebtoken = "9.3.0"
 
 [dev-dependencies]
 test-helpers = {version = "0.1.0", path = "../test_helpers"}

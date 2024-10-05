@@ -8,37 +8,27 @@ use crate::storage::local::LocalStorage;
 use crate::storage::s3::S3Storage;
 use crate::storage::Storage;
 use actix_cors::Cors;
-use actix_web::body::MessageBody;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::middleware::{from_fn, Logger, Next};
-use actix_web::{web, App, Error, HttpServer};
+use actix_web::middleware::Logger;
+use actix_web::web::Data;
+use actix_web::{App, HttpServer};
 use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
 use std::path::Path;
 use std::{env, fs};
 
-mod error;
-
 mod api;
-
-mod repository;
-
-mod storage;
-
+mod auth;
 mod configuration;
-
-async fn auth(
-    req: ServiceRequest,
-    next: Next<impl MessageBody>,
-) -> Result<ServiceResponse<impl MessageBody>, Error> {
-    next.call(req).await
-}
+mod error;
+mod jwt;
+mod repository;
+mod storage;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 
-    let connection_url = std::env::var("DATABASE_URL")
+    let connection_url = env::var("DATABASE_URL")
         .unwrap_or("postgres://postgres:password@localhost/postgres".to_string());
 
     let pool = PgPoolOptions::new()
@@ -52,7 +42,7 @@ async fn main() -> std::io::Result<()> {
     let role_repository = RoleRepository::new(pool.clone());
 
     HttpServer::new(move || {
-        let storage: Box<dyn Storage> = match std::env::var("STORAGE_TYPE")
+        let storage: Box<dyn Storage> = match env::var("STORAGE_TYPE")
             .unwrap_or("LOCAL".to_string())
             .as_str()
         {
@@ -73,12 +63,11 @@ async fn main() -> std::io::Result<()> {
                     .allow_any_origin(),
             )
             .wrap(Logger::default())
-            .wrap(from_fn(auth))
-            .app_data(web::Data::new(cargo_repository.clone()))
-            .app_data(web::Data::new(service_account_repository.clone()))
-            .app_data(web::Data::new(role_repository.clone()))
-            .app_data(web::Data::new(storage))
-            .app_data(web::Data::new(load_configuration()))
+            .app_data(Data::new(cargo_repository.clone()))
+            .app_data(Data::new(service_account_repository.clone()))
+            .app_data(Data::new(role_repository.clone()))
+            .app_data(Data::new(storage))
+            .app_data(Data::new(load_configuration()))
             .service(get_cargo_scope())
             .service(api_scope())
             .service(
@@ -100,7 +89,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 fn load_configuration() -> Configuration {
-    let config_path = std::env::var("CONFIG_PATH").unwrap_or("config.toml".to_string());
+    let config_path = env::var("CONFIG_PATH").unwrap_or("config.toml".to_string());
 
     let config_file = match fs::read_to_string(&config_path) {
         Ok(file) => file,

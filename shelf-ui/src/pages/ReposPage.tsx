@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  CopyToClipboard,
   FormField,
   Header,
   Input,
@@ -70,6 +71,10 @@ function ReposPage() {
 
   function show_create_repo_dialog() {
     setShowModal(true);
+  }
+
+  function receive_config(repo: Repo): string {
+    return `${repo.name} = { index = "sparse+${axios.defaults.baseURL}cargo/${repo.name}/index/" }`;
   }
 
   return (
@@ -149,6 +154,18 @@ function ReposPage() {
             id: "public",
             header: "Public",
             cell: (repo) => String(repo.public),
+          },
+          {
+            id: "action",
+            header: "config",
+            cell: (repo) => (
+              <CopyToClipboard
+                variant="inline"
+                textToCopy={receive_config(repo)}
+                copySuccessText="Config copied"
+                copyErrorText="Could not copy config"
+              />
+            ),
           },
         ]}
         header={
