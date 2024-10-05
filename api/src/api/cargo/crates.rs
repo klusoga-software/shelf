@@ -24,13 +24,15 @@ pub async fn upload(
 ) -> impl Responder {
     match check_auth(req, "W".to_string()).await {
         Ok(_) => {}
-        Err(err) => match err {
-            AuthError::Unauthorized(message) => return HttpResponse::Unauthorized().body(message),
-            AuthError::ActixDataMissing(message) => {
-                return HttpResponse::InternalServerError().body(message)
+        Err(err) => {
+            return match err {
+                AuthError::Unauthorized(message) => HttpResponse::Unauthorized().body(message),
+                AuthError::ActixDataMissing(message) => {
+                    HttpResponse::InternalServerError().body(message)
+                }
+                AuthError::RepositoryNotFound(repo) => HttpResponse::NotFound().body(repo),
             }
-            AuthError::RepositoryNotFound(repo) => return HttpResponse::NotFound().body(repo),
-        },
+        }
     }
 
     let (crate_index, crate_file) = match parse_crate(body.reader()) {
@@ -73,6 +75,7 @@ pub async fn upload(
 pub async fn download(
     path: web::Path<(String, String, String)>,
     state: web::Data<CargoRepository>,
+    req: HttpRequest,
 ) -> actix_web::Result<NamedFile> {
     let (name, crate_name, version) = path.into_inner();
 
@@ -80,6 +83,25 @@ pub async fn download(
         Ok(repo) => repo,
         Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
     };
+
+    if !repo.public {
+        match check_auth(req, "R".to_string()).await {
+            Ok(_) => {}
+            Err(err) => {
+                return match err {
+                    AuthError::Unauthorized(message) => {
+                        Err(actix_web::error::ErrorUnauthorized(message))
+                    }
+                    AuthError::ActixDataMissing(message) => {
+                        Err(actix_web::error::ErrorInternalServerError(message))
+                    }
+                    AuthError::RepositoryNotFound(repo) => {
+                        Err(actix_web::error::ErrorNotFound(repo))
+                    }
+                }
+            }
+        }
+    }
 
     let crate_index = match state
         .get_index_by_name_id_and_version(&crate_name, &version, &repo.id.unwrap())
