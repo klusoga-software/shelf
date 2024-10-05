@@ -9,10 +9,7 @@ pub fn crate_controller() -> Scope {
 }
 
 #[get("/{repo_id}")]
-pub async fn get_crates(
-    state: web::Data<CargoRepository>,
-    repo_id: web::Path<i32>,
-) -> impl Responder {
+async fn get_crates(state: web::Data<CargoRepository>, repo_id: web::Path<i32>) -> impl Responder {
     let crates = match state.list_crates_for_repo(repo_id.into_inner()).await {
         Ok(crates) => crates,
         Err(err) => return log_error_and_responde!(err),
@@ -22,7 +19,7 @@ pub async fn get_crates(
 }
 
 #[delete("/{crate_id}")]
-pub async fn delete_crate(
+async fn delete_crate(
     state: web::Data<CargoRepository>,
     crate_id: web::Path<i32>,
 ) -> impl Responder {

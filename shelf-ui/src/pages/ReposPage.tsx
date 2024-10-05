@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  CopyToClipboard,
   FormField,
   Header,
   Input,
@@ -37,7 +38,7 @@ function ReposPage() {
 
   function load_repos() {
     setLoading(true);
-    axios.get("/api/repo").then((response) => {
+    axios.get("/api/repos").then((response) => {
       setRepos(response.data);
       setLoading(false);
     });
@@ -45,7 +46,7 @@ function ReposPage() {
 
   function create_repo() {
     axios
-      .post("/api/repo", {
+      .post("/api/repos", {
         name: repoName,
         repo_type: repoType.value,
         public: repoPublic,
@@ -61,7 +62,7 @@ function ReposPage() {
 
   function delete_repos() {
     for (const repo of selectedRepo) {
-      axios.delete(`/api/repo/${repo.id}`).then(() => {
+      axios.delete(`/api/repos/${repo.id}`).then(() => {
         setSelectedRepo([]);
         load_repos();
       });
@@ -70,6 +71,10 @@ function ReposPage() {
 
   function show_create_repo_dialog() {
     setShowModal(true);
+  }
+
+  function receive_config(repo: Repo): string {
+    return `${repo.name} = { index = "sparse+${axios.defaults.baseURL}cargo/${repo.name}/index/" }`;
   }
 
   return (
@@ -149,6 +154,18 @@ function ReposPage() {
             id: "public",
             header: "Public",
             cell: (repo) => String(repo.public),
+          },
+          {
+            id: "action",
+            header: "config",
+            cell: (repo) => (
+              <CopyToClipboard
+                variant="inline"
+                textToCopy={receive_config(repo)}
+                copySuccessText="Config copied"
+                copyErrorText="Could not copy config"
+              />
+            ),
           },
         ]}
         header={

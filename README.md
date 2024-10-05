@@ -19,6 +19,7 @@ Supported Packages:
 | RUST_LOG     | The log level you want to use                                                      | info                                            |
 | BASE_URL     | The url on which this application is reachable                                     | http://localhost:6300                           |
 | CONFIG_PATH  | The path to the config file                                                        | ./config.toml                                   |
+| JWT_SECRET   | Secret for creating JWT Tokens for Service Accounts                                | secret                                          |
 
 ## How to setup:
 

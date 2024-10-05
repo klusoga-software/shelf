@@ -1,12 +1,13 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
-use crate::error::Error;
+use crate::auth::check_auth;
+use crate::error::{AuthError, Error};
 use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::Crate;
 use crate::storage::Storage;
 use actix_files::NamedFile;
 use actix_web::web::{Buf, Bytes};
-use actix_web::{get, put, web, HttpResponse, Responder};
+use actix_web::{get, put, web, HttpRequest, HttpResponse, Responder};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use sqlx::types::Json;
@@ -19,7 +20,21 @@ pub async fn upload(
     body: Bytes,
     state: web::Data<CargoRepository>,
     storage_state: web::Data<Box<dyn Storage>>,
+    req: HttpRequest,
 ) -> impl Responder {
+    match check_auth(req, "W".to_string()).await {
+        Ok(_) => {}
+        Err(err) => {
+            return match err {
+                AuthError::Unauthorized(message) => HttpResponse::Unauthorized().body(message),
+                AuthError::ActixDataMissing(message) => {
+                    HttpResponse::InternalServerError().body(message)
+                }
+                AuthError::RepositoryNotFound(repo) => HttpResponse::NotFound().body(repo),
+            }
+        }
+    }
+
     let (crate_index, crate_file) = match parse_crate(body.reader()) {
         Ok(res) => res,
         Err(err) => return log_error_and_responde!(err),
@@ -60,6 +75,7 @@ pub async fn upload(
 pub async fn download(
     path: web::Path<(String, String, String)>,
     state: web::Data<CargoRepository>,
+    req: HttpRequest,
 ) -> actix_web::Result<NamedFile> {
     let (name, crate_name, version) = path.into_inner();
 
@@ -67,6 +83,25 @@ pub async fn download(
         Ok(repo) => repo,
         Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
     };
+
+    if !repo.public {
+        match check_auth(req, "R".to_string()).await {
+            Ok(_) => {}
+            Err(err) => {
+                return match err {
+                    AuthError::Unauthorized(message) => {
+                        Err(actix_web::error::ErrorUnauthorized(message))
+                    }
+                    AuthError::ActixDataMissing(message) => {
+                        Err(actix_web::error::ErrorInternalServerError(message))
+                    }
+                    AuthError::RepositoryNotFound(repo) => {
+                        Err(actix_web::error::ErrorNotFound(repo))
+                    }
+                }
+            }
+        }
+    }
 
     let crate_index = match state
         .get_index_by_name_id_and_version(&crate_name, &version, &repo.id.unwrap())
