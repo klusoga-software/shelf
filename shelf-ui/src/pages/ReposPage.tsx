@@ -74,7 +74,7 @@ function ReposPage() {
   }
 
   function receive_config(repo: Repo): string {
-    return `${repo.name} = { index = "sparse+${axios.defaults.baseURL}cargo/${repo.name}/index/" }`;
+    return `${repo.name} = { index = "sparse+${axios.defaults.baseURL ?? window.location.host + "/"}cargo/${repo.name}/index/" }`;
   }
 
   return (
