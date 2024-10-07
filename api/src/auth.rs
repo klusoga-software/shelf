@@ -1,11 +1,13 @@
+use crate::configuration::{Configuration, OidcConfiguration};
 use crate::error::AuthError;
-use crate::jwt::Claims;
+use crate::jwt::{ApiClaims, ServiceAccountClaims};
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
-use actix_web::dev::{Payload, Transform};
+use actix_web::dev::Payload;
 use actix_web::web::Data;
 use actix_web::{Error, FromRequest, HttpRequest};
-use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
+use jsonwebtoken::jwk::JwkSet;
+use jsonwebtoken::{decode, decode_header, Algorithm, DecodingKey, Validation};
 use std::env;
 use std::future::Future;
 use std::pin::Pin;
@@ -47,7 +49,7 @@ pub async fn check_package_auth(
         let mut validation = Validation::new(Algorithm::HS256);
         validation.set_audience(&["shelf"]);
 
-        let claims = match decode::<Claims>(
+        let claims = match decode::<ServiceAccountClaims>(
             header.to_str().unwrap(),
             &DecodingKey::from_secret(secret.as_bytes()),
             &validation,
@@ -105,7 +107,9 @@ fn get_repository_name(path: &str) -> String {
     strings[2].to_string()
 }
 
-pub struct User {}
+pub struct User {
+    _claims: ApiClaims,
+}
 
 impl FromRequest for User {
     type Error = Error;
@@ -113,6 +117,18 @@ impl FromRequest for User {
 
     fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
         let req = req.clone();
+        let configuration = match req.app_data::<Data<Configuration>>() {
+            None => {
+                return Box::pin(async {
+                    Err(actix_web::error::ErrorInternalServerError(
+                        "internal server error",
+                    ))
+                })
+            }
+            Some(config) => config.clone(),
+        };
+
+        let oidc_config_url = configuration.ui.oidc_configuration_url.clone();
 
         Box::pin(async move {
             let auth_header = match req.headers().get("Authorization") {
@@ -120,7 +136,41 @@ impl FromRequest for User {
                 Some(token) => token,
             };
 
-            Ok(User {})
+            let token = match auth_header.to_str() {
+                Ok(header) => header.trim_start_matches("Bearer ").to_string(),
+                Err(err) => return Err(actix_web::error::ErrorInternalServerError(err)),
+            };
+
+            let token_header =
+                decode_header(&token).map_err(actix_web::error::ErrorUnauthorized)?;
+
+            let response: OidcConfiguration = reqwest::get(oidc_config_url)
+                .await
+                .map_err(actix_web::error::ErrorInternalServerError)?
+                .json()
+                .await
+                .map_err(actix_web::error::ErrorInternalServerError)?;
+
+            let response: JwkSet = reqwest::get(response.jwks_uri)
+                .await
+                .map_err(actix_web::error::ErrorInternalServerError)?
+                .json()
+                .await
+                .map_err(actix_web::error::ErrorInternalServerError)?;
+
+            let key = DecodingKey::from_jwk(response.find(&token_header.kid.unwrap()).unwrap())
+                .map_err(actix_web::error::ErrorInternalServerError)?;
+
+            let mut validation = Validation::new(token_header.alg);
+            validation.set_audience(&[&configuration.auth.audience]);
+            validation.set_issuer(&[&configuration.auth.issuer]);
+
+            let claim = decode::<ApiClaims>(&token, &key, &validation)
+                .map_err(actix_web::error::ErrorUnauthorized)?;
+
+            Ok(User {
+                _claims: claim.claims,
+            })
         })
     }
 }

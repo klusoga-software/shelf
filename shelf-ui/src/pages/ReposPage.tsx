@@ -36,7 +36,9 @@ function ReposPage() {
   const auth = useAuth();
 
   useEffect(() => {
-    load_repos();
+    if (auth.user){
+      load_repos();
+    }
   }, [auth]);
 
   function load_repos() {

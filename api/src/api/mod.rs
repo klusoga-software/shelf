@@ -4,8 +4,7 @@ use crate::api::health_controller::get_health;
 use crate::api::repo_controller::repo_controller;
 use crate::api::role_controller::role_controller;
 use crate::api::service_account_controller::service_account_controller;
-use actix_web::dev::ServiceFactory;
-use actix_web::{web, Scope};
+use actix_web::Scope;
 
 pub mod cargo;
 pub mod configuration;

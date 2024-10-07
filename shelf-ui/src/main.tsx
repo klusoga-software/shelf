@@ -12,21 +12,23 @@ if (import.meta.env.MODE === 'development'){
 }
 
 axios.get('/api/configuration').then((res) => {
-    const authProviderProps: AuthProviderProps ={
-        authority: res.data.authority,
+    axios.get(res.data.oidc_configuration_url).then((res) => {
+        const authProviderProps: AuthProviderProps ={
+            authority: res.data.issuer,
             client_id: "shelf",
-        redirect_uri: document.location.origin + "/",
-        userStore: new WebStorageStateStore({ store: window.localStorage }),
-        scope: "openid email",
-    }
+            redirect_uri: document.location.origin + "/",
+            userStore: new WebStorageStateStore({ store: window.localStorage }),
+            scope: "openid email",
+        }
 
-    createRoot(document.getElementById("root")!).render(
-        <StrictMode>
-            <AuthProvider {...authProviderProps}>
-                <BrowserRouter>
-                    <App />
-                </BrowserRouter>
-            </AuthProvider>
-        </StrictMode>,
-    );
+        createRoot(document.getElementById("root")!).render(
+            <StrictMode>
+                <AuthProvider {...authProviderProps}>
+                    <BrowserRouter>
+                        <App />
+                    </BrowserRouter>
+                </AuthProvider>
+            </StrictMode>,
+        );
+    })
 })
