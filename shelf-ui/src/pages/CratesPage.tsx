@@ -8,6 +8,7 @@ import {
   SpaceBetween,
   Table,
 } from "@cloudscape-design/components";
+import { useAuth } from "react-oidc-context";
 
 function CratesPage() {
   const [crates, setCrates] = useState<Crate[]>([]);
@@ -15,24 +16,34 @@ function CratesPage() {
   const params = useParams();
   const [selectedCrates, setSelectedCrates] = useState<Crate[]>([]);
 
+  const auth = useAuth();
+
   useEffect(() => {
     get_crates();
-  }, []);
+  }, [auth]);
 
   function get_crates() {
     setLoading(true);
-    axios.get(`/api/crate/${params.id}`).then((res) => {
-      setCrates(res.data);
-      setLoading(false);
-    });
+    axios
+      .get(`/api/crate/${params.id}`, {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
+      .then((res) => {
+        setCrates(res.data);
+        setLoading(false);
+      });
   }
 
   function delete_crate() {
     for (const crate of selectedCrates) {
-      axios.delete(`/api/crate/${crate.id}`).then(() => {
-        get_crates();
-        setSelectedCrates([]);
-      });
+      axios
+        .delete(`/api/crate/${crate.id}`, {
+          headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+        })
+        .then(() => {
+          get_crates();
+          setSelectedCrates([]);
+        });
     }
   }
 

@@ -1,4 +1,5 @@
 use crate::api::models::CreateRepoRequest;
+use crate::auth::User;
 use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::models::{Config, Repo};
@@ -16,6 +17,7 @@ pub fn repo_controller() -> actix_web::Scope {
 async fn create_repo(
     state: web::Data<CargoRepository>,
     repo: web::Json<CreateRepoRequest>,
+    user: User,
 ) -> impl Responder {
     let base_url = env::var("BASE_URL").unwrap_or("http://localhost:6300".to_string());
 
@@ -47,7 +49,7 @@ async fn create_repo(
 }
 
 #[get("")]
-async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
+async fn get_repos(state: web::Data<CargoRepository>, user: User) -> impl Responder {
     match state.get_repos().await {
         Ok(repos) => HttpResponse::Ok().json(repos),
         Err(err) => log_error_and_responde!(err),
@@ -55,7 +57,11 @@ async fn get_repos(state: web::Data<CargoRepository>) -> impl Responder {
 }
 
 #[delete("/{id}")]
-async fn delete_repo(state: web::Data<CargoRepository>, id: web::Path<i32>) -> impl Responder {
+async fn delete_repo(
+    state: web::Data<CargoRepository>,
+    id: web::Path<i32>,
+    user: User,
+) -> impl Responder {
     let id = id.into_inner();
 
     match state.delete_config(&id).await {

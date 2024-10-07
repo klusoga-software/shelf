@@ -57,3 +57,5 @@ impl Display for AuthError {
         }
     }
 }
+
+impl actix_web::ResponseError for AuthError {}

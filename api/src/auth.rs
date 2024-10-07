@@ -2,12 +2,44 @@ use crate::error::AuthError;
 use crate::jwt::Claims;
 use crate::repository::cargo_repository::CargoRepository;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
+use actix_web::dev::{Payload, Transform};
 use actix_web::web::Data;
-use actix_web::HttpRequest;
+use actix_web::{Error, FromRequest, HttpRequest};
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use std::env;
+use std::future::Future;
+use std::pin::Pin;
 
-pub async fn check_auth(req: HttpRequest, required_permission: String) -> Result<(), AuthError> {
+/// Used to verify service account jwt.
+/// It will extract the auth header directly from the HttpRequest
+///
+/// # Arguments
+///
+/// * `req`: The http request out of the http handler
+/// * `required_permission`: The string of the minimum requirements that are needed
+///
+/// returns: Result<(), AuthError>
+///
+/// # Examples
+///
+/// ```
+/// match check_package_auth(req, "W".to_string()).await {
+///     Ok(_) => {}
+///     Err(err) => {
+///         return match err {
+///             AuthError::Unauthorized(message) => HttpResponse::Unauthorized().body(message),
+///             AuthError::ActixDataMissing(message) => {
+///                 HttpResponse::InternalServerError().body(message)
+///             }
+///             AuthError::RepositoryNotFound(repo) => HttpResponse::NotFound().body(repo),
+///         }
+///     }
+/// }
+/// ```
+pub async fn check_package_auth(
+    req: HttpRequest,
+    required_permission: String,
+) -> Result<(), AuthError> {
     if req.uri().path().contains("/cargo") && req.headers().get("Authorization").is_some() {
         let header = req.headers().get("Authorization").unwrap();
         let secret = env::var("JWT_SECRET").unwrap_or("secret".to_string());
@@ -71,4 +103,24 @@ fn get_repository_name(path: &str) -> String {
     let strings: Vec<&str> = path.split("/").collect();
 
     strings[2].to_string()
+}
+
+pub struct User {}
+
+impl FromRequest for User {
+    type Error = Error;
+    type Future = Pin<Box<dyn Future<Output = Result<User, Error>>>>;
+
+    fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
+        let req = req.clone();
+
+        Box::pin(async move {
+            let auth_header = match req.headers().get("Authorization") {
+                None => return Err(actix_web::error::ErrorUnauthorized("invalid token")),
+                Some(token) => token,
+            };
+
+            Ok(User {})
+        })
+    }
 }

@@ -1,4 +1,5 @@
 use crate::api::models::CreateServiceAccount;
+use crate::auth::User;
 use crate::jwt::Claims;
 use crate::log_error_and_responde;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
@@ -17,7 +18,10 @@ pub fn service_account_controller() -> Scope {
 }
 
 #[get("")]
-async fn list_service_accounts(state: web::Data<ServiceAccountsRepository>) -> impl Responder {
+async fn list_service_accounts(
+    state: web::Data<ServiceAccountsRepository>,
+    user: User,
+) -> impl Responder {
     match state.list_service_accounts().await {
         Ok(service_accounts) => HttpResponse::Ok().json(service_accounts),
         Err(err) => log_error_and_responde!(err),
@@ -28,6 +32,7 @@ async fn list_service_accounts(state: web::Data<ServiceAccountsRepository>) -> i
 async fn create_service_account(
     state: web::Data<ServiceAccountsRepository>,
     body: Json<CreateServiceAccount>,
+    user: User,
 ) -> impl Responder {
     let create_service_account = body.into_inner();
 
@@ -65,6 +70,7 @@ async fn create_service_account(
 async fn delete_service_account(
     state: web::Data<ServiceAccountsRepository>,
     id: web::Path<i32>,
+    user: User,
 ) -> impl Responder {
     match state.delete_service_account(id.into_inner()).await {
         Ok(_) => HttpResponse::NoContent().finish(),
