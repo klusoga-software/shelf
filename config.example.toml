@@ -1,0 +1,6 @@
+[ui]
+oidc_configuration_url = "http://localhost:8080/.well-known/openid-configuration"
+
+[auth]
+audience = "account"
+issuer = "http://localhost:8080/"

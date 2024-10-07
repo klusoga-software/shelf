@@ -19,6 +19,7 @@ import { ServiceAccount } from "../models/service-account.ts";
 import axios from "axios";
 import { Role } from "../models/role.ts";
 import { Repo } from "../models/repo.ts";
+import { useAuth } from "react-oidc-context";
 
 function ServiceAccountsPage() {
   const [loading, setLoading] = useState(true);
@@ -41,24 +42,34 @@ function ServiceAccountsPage() {
   const [showSecretModal, setShowSecretModal] = useState(false);
   const [secret, setSecret] = useState("");
 
+  const auth = useAuth();
+
   useEffect(() => {
     load_service_accounts();
     load_roles();
     load_repos();
-  }, []);
+  }, [auth]);
 
   function load_service_accounts() {
     setLoading(true);
-    axios.get("/api/service-accounts").then((response) => {
-      setServiceAccounts(response.data);
-      setLoading(false);
-    });
+    axios
+      .get("/api/service-accounts", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
+      .then((response) => {
+        setServiceAccounts(response.data);
+        setLoading(false);
+      });
   }
   function delete_service_account() {
     for (const sa of selectedServiceAccounts) {
-      axios.delete(`/api/service-accounts/${sa.id}`).then(() => {
-        load_service_accounts();
-      });
+      axios
+        .delete(`/api/service-accounts/${sa.id}`, {
+          headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+        })
+        .then(() => {
+          load_service_accounts();
+        });
     }
   }
   function create_service_account() {
@@ -69,11 +80,15 @@ function ServiceAccountsPage() {
     });
 
     axios
-      .post("/api/service-accounts", {
-        name: name,
-        repo_list: mapping,
-        expired_at: noExpiration ? null : expiration,
-      })
+      .post(
+        "/api/service-accounts",
+        {
+          name: name,
+          repo_list: mapping,
+          expired_at: noExpiration ? null : expiration,
+        },
+        { headers: { Authorization: `Bearer ${auth.user?.access_token}` } },
+      )
       .then((response) => {
         setSecret(response.data.secret);
         setShowSecretModal(true);
@@ -86,25 +101,33 @@ function ServiceAccountsPage() {
   }
 
   function load_roles() {
-    axios.get<Role[]>("/api/roles").then((response) => {
-      const newRoles = response.data.map((role) => ({
-        label: role.name,
-        value: role.id.toString(),
-      }));
-      setRoles(newRoles);
-      setLoading(false); // We set loading false after the data is loaded
-    });
+    axios
+      .get<
+        Role[]
+      >("/api/roles", { headers: { Authorization: `Bearer ${auth.user?.access_token}` } })
+      .then((response) => {
+        const newRoles = response.data.map((role) => ({
+          label: role.name,
+          value: role.id.toString(),
+        }));
+        setRoles(newRoles);
+        setLoading(false); // We set loading false after the data is loaded
+      });
   }
 
   function load_repos() {
-    axios.get<Repo[]>("/api/repos").then((response) => {
-      const newRepos = response.data.map((repo) => ({
-        label: repo.name,
-        value: repo.id.toString(),
-      }));
-      setRepos(newRepos);
-      setLoading(false); // We set loading false after the data is loaded
-    });
+    axios
+      .get<
+        Repo[]
+      >("/api/repos", { headers: { Authorization: `Bearer ${auth.user?.access_token}` } })
+      .then((response) => {
+        const newRepos = response.data.map((repo) => ({
+          label: repo.name,
+          value: repo.id.toString(),
+        }));
+        setRepos(newRepos);
+        setLoading(false); // We set loading false after the data is loaded
+      });
   }
 
   function repo_roles(): JSX.Element[] {

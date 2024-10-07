@@ -6,3 +6,5 @@ crates/
 assets/**/*
 
 dist/
+
+config.toml

@@ -1,5 +1,5 @@
 use crate::api::cargo::models::{CrateIndex, Metadata};
-use crate::auth::check_auth;
+use crate::auth::check_package_auth;
 use crate::error::{AuthError, Error};
 use crate::log_error_and_responde;
 use crate::repository::cargo_repository::CargoRepository;
@@ -22,7 +22,7 @@ pub async fn upload(
     storage_state: web::Data<Box<dyn Storage>>,
     req: HttpRequest,
 ) -> impl Responder {
-    match check_auth(req, "W".to_string()).await {
+    match check_package_auth(req, "W".to_string()).await {
         Ok(_) => {}
         Err(err) => {
             return match err {
@@ -85,7 +85,7 @@ pub async fn download(
     };
 
     if !repo.public {
-        match check_auth(req, "R".to_string()).await {
+        match check_package_auth(req, "R".to_string()).await {
             Ok(_) => {}
             Err(err) => {
                 return match err {

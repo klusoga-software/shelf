@@ -17,6 +17,7 @@ import {
   Toggle,
 } from "@cloudscape-design/components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
 
 function ReposPage() {
   const [repos, setRepos] = useState<Repo[]>([]);
@@ -32,25 +33,37 @@ function ReposPage() {
   const [selectedRepo, setSelectedRepo] = useState<Repo[]>([]);
   const navigate = useNavigate();
 
+  const auth = useAuth();
+
   useEffect(() => {
-    load_repos();
-  }, []);
+    if (auth.user){
+      load_repos();
+    }
+  }, [auth]);
 
   function load_repos() {
     setLoading(true);
-    axios.get("/api/repos").then((response) => {
-      setRepos(response.data);
-      setLoading(false);
-    });
+    axios
+      .get("/api/repos", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
+      .then((response) => {
+        setRepos(response.data);
+        setLoading(false);
+      });
   }
 
   function create_repo() {
     axios
-      .post("/api/repos", {
-        name: repoName,
-        repo_type: repoType.value,
-        public: repoPublic,
-      })
+      .post(
+        "/api/repos",
+        {
+          name: repoName,
+          repo_type: repoType.value,
+          public: repoPublic,
+        },
+        { headers: { Authorization: `Bearer ${auth.user?.access_token}` } },
+      )
       .then(() => {
         setRepoType({ value: "Cargo" });
         setRepoName("");
@@ -62,10 +75,14 @@ function ReposPage() {
 
   function delete_repos() {
     for (const repo of selectedRepo) {
-      axios.delete(`/api/repos/${repo.id}`).then(() => {
-        setSelectedRepo([]);
-        load_repos();
-      });
+      axios
+        .delete(`/api/repos/${repo.id}`, {
+          headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+        })
+        .then(() => {
+          setSelectedRepo([]);
+          load_repos();
+        });
     }
   }
 

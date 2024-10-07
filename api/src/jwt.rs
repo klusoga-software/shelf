@@ -1,16 +1,21 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Claims {
+pub struct ServiceAccountClaims {
     pub exp: usize,
     pub key: String,
     pub aud: String,
     pub sub: i32,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ApiClaims {
+    pub name: String,
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::jwt::Claims;
+    use crate::jwt::ServiceAccountClaims;
     use chrono::{DateTime, Utc};
     use jsonwebtoken::{encode, EncodingKey, Header};
     use std::str::FromStr;
@@ -21,7 +26,7 @@ mod tests {
 
         let timestamp = dt.timestamp() as usize;
 
-        let claims = Claims {
+        let claims = ServiceAccountClaims {
             exp: timestamp,
             key: "internal".to_string(),
             aud: "shelf".to_string(),

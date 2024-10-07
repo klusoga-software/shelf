@@ -1,5 +1,6 @@
 use crate::api::models::CreateServiceAccount;
-use crate::jwt::Claims;
+use crate::auth::User;
+use crate::jwt::ServiceAccountClaims;
 use crate::log_error_and_responde;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
 use actix_web::web::Json;
@@ -17,7 +18,10 @@ pub fn service_account_controller() -> Scope {
 }
 
 #[get("")]
-async fn list_service_accounts(state: web::Data<ServiceAccountsRepository>) -> impl Responder {
+async fn list_service_accounts(
+    state: web::Data<ServiceAccountsRepository>,
+    _user: User,
+) -> impl Responder {
     match state.list_service_accounts().await {
         Ok(service_accounts) => HttpResponse::Ok().json(service_accounts),
         Err(err) => log_error_and_responde!(err),
@@ -28,6 +32,7 @@ async fn list_service_accounts(state: web::Data<ServiceAccountsRepository>) -> i
 async fn create_service_account(
     state: web::Data<ServiceAccountsRepository>,
     body: Json<CreateServiceAccount>,
+    _user: User,
 ) -> impl Responder {
     let create_service_account = body.into_inner();
 
@@ -37,7 +42,7 @@ async fn create_service_account(
                 .expired_at
                 .unwrap_or(DateTime::<Utc>::from_str("2999-01-01T00:00:00Z").unwrap());
 
-            let claims = Claims {
+            let claims = ServiceAccountClaims {
                 key: create_service_account.name.clone(),
                 aud: "shelf".to_string(),
                 exp: expired_at.timestamp() as usize,
@@ -65,6 +70,7 @@ async fn create_service_account(
 async fn delete_service_account(
     state: web::Data<ServiceAccountsRepository>,
     id: web::Path<i32>,
+    _user: User,
 ) -> impl Responder {
     match state.delete_service_account(id.into_inner()).await {
         Ok(_) => HttpResponse::NoContent().finish(),
