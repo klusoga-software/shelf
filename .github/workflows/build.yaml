@@ -105,8 +105,21 @@ jobs:
       - name: Build docker image
         id: push
         run: |
-          docker build --build-arg Token=${{ secrets.ACTIONS_PAT }} --push -t ${{ env.IMAGE }}:${{ needs.tag.outputs.semver }} .
+          docker build --build-arg Token=${{ secrets.ACTIONS_PAT }} --push -t ${{ env.IMAGE }}:${{ needs.tag.outputs.semver }} -t ${{ env.IMAGE }}:latest .
           echo "IMAGE=${{ env.IMAGE }}:${{ needs.tag.outputs.semver }}" >> $GITHUB_OUTPUT
+
+  release-chart:
+    name: Release Helm Chart
+    runs-on: ubuntu-latest
+    needs:
+      - tag
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u klusoga ghcr.io
+          cd charts/shelf
+          helm package --app-version ${{ needs.tag.outputs.semver }} .
+          helm push *.tgz oci://ghcr.io/shelf          
 
   deploy_dev:
     name: Deploy Api
