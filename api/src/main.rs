@@ -41,6 +41,8 @@ async fn main() -> std::io::Result<()> {
     let service_account_repository = ServiceAccountsRepository::new(pool.clone());
     let role_repository = RoleRepository::new(pool.clone());
 
+    let binding = env::var("HTTP_BINDING").unwrap_or("0.0.0.0:6300".to_string());
+
     HttpServer::new(move || {
         let storage: Box<dyn Storage> = match env::var("STORAGE_TYPE")
             .unwrap_or("LOCAL".to_string())
@@ -83,7 +85,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(actix_files::Files::new("/{all}*", ui_directory).index_file("index.html"))
     })
-    .bind(("0.0.0.0", 6300))?
+    .bind(binding)?
     .run()
     .await
 }

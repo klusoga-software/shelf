@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "shelf.fullname" . }}
+data:
+  config.toml: |
+    [ui]
+    oidc_configuration_url = "{{ .Values.security.oidcConfigUrl }}"
+    
+    [auth]
+    audience = "{{ .Values.security.audience }}"
+    issuer = "{{ .Values.security.issuer }}"

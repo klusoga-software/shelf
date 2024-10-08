@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: "StatefulSet"
+metadata:
+  name: {{ include "shelf.fullname" . }}
+  {{- with .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "shelf.selectorLabels" . | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "shelf.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "shelf.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: crates
+          persistentVolumeClaim:
+            claimName: {{ include "shelf.fullname" . }}-crates
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "shelf.fullname" . }}
+            items:
+              - key: config.toml
+                path: config.toml
+      imagePullSecrets:
+        - name: klusoga
+      initContainers:
+        - name: migrator
+          image: "{{ .Values.migrator.image.name }}:{{ .Values.migrator.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: datbase_url
+                  name: {{ include "shelf.fullname" . }}
+          command:
+            - /bin/migrator
+      containers:
+        - name: shelf
+          image: "{{ .Values.deployment.image.name }}:{{ .Values.deployment.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: BASE_URL
+              value: "{{ .Values.configuration.baseUrl }}"
+            - name: CRATES_DIR
+              value: /crates
+            - name: CONFIG_PATH
+              value: /config.toml
+            - name: HTTP_BINDING
+              value: "{{ .Values.configuration.ipBinding }}:{{ .Values.configuration.port }}"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: datbase_url
+                  name: {{ include "shelf.fullname" . }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt_secret
+                  name: {{ include "shelf.fullname" . }}
+            {{- with .Values.configuration.extraEnv }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.configuration.port }}
+              name: http
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /health
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /health
+          volumeMounts:
+            {{- if .Values.persistence.enabled }}
+            - mountPath: /crates
+              name: crates
+            {{- end }}
+            - mountPath: /config.toml
+              name: config
+              subPath: config.toml
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+  serviceName: {{ include "shelf.fullname" . }}
