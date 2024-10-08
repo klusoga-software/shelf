@@ -116,7 +116,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u klusoga ghcr.io
+          helm registry login -u klusoga -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
           cd charts/shelf
           helm package --app-version ${{ needs.tag.outputs.semver }} .
           helm push *.tgz oci://ghcr.io/shelf          
