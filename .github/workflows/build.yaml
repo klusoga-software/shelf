@@ -119,7 +119,7 @@ jobs:
           helm registry login -u klusoga -p ${{ secrets.HELM_TOKEN }} ghcr.io
           cd charts/shelf
           helm package --app-version ${{ needs.tag.outputs.semver }} .
-          helm push *.tgz oci://ghcr.io/          
+          helm push *.tgz oci://ghcr.io/klusoga-software        
 
   deploy_dev:
     name: Deploy Api
