@@ -12,14 +12,15 @@ Supported Packages:
 
 ## Configuration
 
-| Name         | Description                                                                        | Default                                         |
-|--------------|------------------------------------------------------------------------------------|-------------------------------------------------|
-| STORAGE_TYPE | Describes the type of storage where you want to store you're artifacts [LOCAL, S3] | LOCAL                                           |
-| DATABASE_URL | The url to the postgres database                                                   | postgres://postgres:password@localhost/postgres |
-| RUST_LOG     | The log level you want to use                                                      | info                                            |
-| BASE_URL     | The url on which this application is reachable                                     | http://localhost:6300                           |
-| CONFIG_PATH  | The path to the config file                                                        | ./config.toml                                   |
-| JWT_SECRET   | Secret for creating JWT Tokens for Service Accounts                                | secret                                          |
+| Name         | Description                                                                                                          | Default                                         |
+|--------------|----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| STORAGE_TYPE | Describes the type of storage where you want to store you're artifacts [LOCAL, S3] currently only local is supported | LOCAL                                           |
+| HTTP_BINDING | The address and port you want to bind the service on                                                                 | 0.0.0.0:6300                                    |
+| DATABASE_URL | The url to the postgres database                                                                                     | postgres://postgres:password@localhost/postgres |
+| RUST_LOG     | The log level you want to use                                                                                        | info                                            |
+| BASE_URL     | The url on which this application is reachable                                                                       | http://localhost:6300                           |
+| CONFIG_PATH  | The path to the config file                                                                                          | ./config.toml                                   |
+| JWT_SECRET   | Secret for creating JWT Tokens for Service Accounts                                                                  | secret                                          |
 
 ## How to setup:
 

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: shelf
+description: The helm chart for shelf
+
+type: application
+
+version: 0.1.0
+
+appVersion: "0.1.0"
