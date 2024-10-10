@@ -22,7 +22,7 @@ impl CargoRepository {
         .await
     }
 
-    pub async fn delete_crate(&self, crate_id: i32) -> Result<PgQueryResult, Error> {
+    pub async fn delete_crate(&self, crate_id: &i32) -> Result<PgQueryResult, Error> {
         sqlx::query(r#"delete from crates where id = $1"#)
             .bind(crate_id)
             .execute(&self.pool)
@@ -105,7 +105,7 @@ RETURNING id
         .await
     }
 
-    pub async fn get_index_by_name_and_id(
+    pub async fn get_index_by_name_and_repo_id(
         &self,
         name: &str,
         id: &i32,
@@ -116,6 +116,15 @@ RETURNING id
         .bind(name)
         .bind(id)
         .fetch_all(&self.pool)
+        .await
+    }
+
+    pub async fn get_index_by_id(&self, id: &i32) -> Result<Crate, Error> {
+        sqlx::query_as::<_, Crate>(
+            r#"select id, name, path, repo_id, version, index from crates where id = $1"#,
+        )
+        .bind(id)
+        .fetch_one(&self.pool)
         .await
     }
 

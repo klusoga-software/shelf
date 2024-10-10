@@ -1,3 +1,4 @@
+use s3::error::S3Error;
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
@@ -5,6 +6,7 @@ pub enum Error {
     IO(std::io::Error),
     CrateParse(String),
     JsonParse(serde_json::Error),
+    S3(S3Error),
 }
 
 impl From<std::io::Error> for Error {
@@ -19,6 +21,12 @@ impl From<serde_json::Error> for Error {
     }
 }
 
+impl From<S3Error> for Error {
+    fn from(value: S3Error) -> Self {
+        Self::S3(value)
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -30,6 +38,9 @@ impl Display for Error {
             }
             Error::JsonParse(err) => {
                 write!(f, "Parse Json failed: {}", err)
+            }
+            Error::S3(err) => {
+                write!(f, "Error while do s3 operation {}", err)
             }
         }
     }

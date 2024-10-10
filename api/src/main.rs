@@ -12,6 +12,9 @@ use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
+use log::debug;
+use s3::creds::Credentials;
+use s3::{Bucket, Region};
 use sqlx::postgres::PgPoolOptions;
 use std::path::Path;
 use std::{env, fs};
@@ -43,6 +46,8 @@ async fn main() -> std::io::Result<()> {
 
     let binding = env::var("HTTP_BINDING").unwrap_or("0.0.0.0:6300".to_string());
 
+    let configuration = load_configuration();
+
     HttpServer::new(move || {
         let storage: Box<dyn Storage> = match env::var("STORAGE_TYPE")
             .unwrap_or("LOCAL".to_string())
@@ -50,7 +55,36 @@ async fn main() -> std::io::Result<()> {
         {
             "LOCAL" => Box::from(LocalStorage {}),
 
-            "S3" => Box::from(S3Storage {}),
+            "S3" => {
+                let s3_configuration = configuration
+                    .s3
+                    .as_ref()
+                    .expect("Unable to load s3 configuration");
+
+                let bucket = match Bucket::new(
+                    &s3_configuration.bucket,
+                    Region::Custom {
+                        region: s3_configuration.region.clone(),
+                        endpoint: s3_configuration.host.clone(),
+                    },
+                    Credentials::new(
+                        Some(&s3_configuration.access_key),
+                        Some(&s3_configuration.secret_key),
+                        None,
+                        None,
+                        None,
+                    )
+                    .expect("Unable to parse s3 credentials"),
+                ) {
+                    Ok(bucket) => {
+                        debug!("{:?}", bucket);
+                        bucket
+                    }
+                    Err(err) => panic!("Unable to access bucket {}", err),
+                };
+
+                Box::from(S3Storage::new(bucket))
+            }
 
             _ => panic!("None storage type matches. Please specify one of [LOCAL, S3]"),
         };

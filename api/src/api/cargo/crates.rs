@@ -63,7 +63,7 @@ pub async fn upload(
         Err(err) => return log_error_and_responde!(err),
     };
 
-    match storage_state.save(crate_path, crate_file) {
+    match storage_state.save(crate_path, crate_file).await {
         Ok(_) => {}
         Err(err) => return log_error_and_responde!(err),
     };
@@ -76,6 +76,7 @@ pub async fn download(
     path: web::Path<(String, String, String)>,
     state: web::Data<CargoRepository>,
     req: HttpRequest,
+    storage: web::Data<Box<dyn Storage>>,
 ) -> actix_web::Result<NamedFile> {
     let (name, crate_name, version) = path.into_inner();
 
@@ -116,7 +117,7 @@ pub async fn download(
         Some(index) => index,
     };
 
-    let file = match NamedFile::open(crate_index.path) {
+    let file = match storage.download(crate_index.path).await {
         Ok(file) => file,
         Err(err) => return Err(actix_web::error::ErrorInternalServerError(err.to_string())),
     };

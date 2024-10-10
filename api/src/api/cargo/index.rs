@@ -44,7 +44,7 @@ pub async fn index_files(
     };
 
     let crate_index = match state
-        .get_index_by_name_and_id(crate_name, &repo.id.unwrap())
+        .get_index_by_name_and_repo_id(crate_name, &repo.id.unwrap())
         .await
     {
         Ok(index) => index,

@@ -26,6 +26,9 @@ toml = "0.8.19"
 bcrypt = "0.15.1"
 rand = "0.8.5"
 jsonwebtoken = "9.3.0"
+rust-s3 = {version = "0.36.0-beta.2", features = ["tokio"]}
+async-trait = "0.1.83"
+uuid = { version = "1.10.0", features = ["v4"] }
 
 [dev-dependencies]
 test-helpers = { version = "0.1.0", path = "../test_helpers" }
