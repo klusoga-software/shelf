@@ -22,7 +22,7 @@ spec:
         {{- include "shelf.selectorLabels" . | nindent 8 }}
     spec:
       volumes:
-        {{- if .Values.persistence.enabled }}
+        {{- if and (.Values.persistence.enabled) (ne .Values.persistence.packageStorage "s3") }}
         - name: crates
           persistentVolumeClaim:
             claimName: {{ include "shelf.fullname" . }}-crates
