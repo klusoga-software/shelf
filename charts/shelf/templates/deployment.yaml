@@ -83,7 +83,7 @@ spec:
               port: http
               path: /health
           volumeMounts:
-            {{- if .Values.persistence.enabled }}
+            {{- if and (.Values.persistence.enabled) (ne .Values.persistence.packageStorage "s3") }}
             - mountPath: /crates
               name: crates
             {{- end }}
