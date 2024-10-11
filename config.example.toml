@@ -4,3 +4,11 @@ oidc_configuration_url = "http://localhost:8080/.well-known/openid-configuration
 [auth]
 audience = "account"
 issuer = "http://localhost:8080/"
+
+# Delete this if you don't want to use s3 storage
+[s3]
+bucket = ""
+host = "https://s3.storage.local"
+access_key = ""
+secret_key = ""
+region = "eu-central-1"

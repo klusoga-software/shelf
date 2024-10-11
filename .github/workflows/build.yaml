@@ -115,7 +115,14 @@ jobs:
       - tag
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            chart:
+              - 'charts/**'
+      - if: steps.changes.outputs.chart == true
+        run: |
           helm registry login -u klusoga -p ${{ secrets.HELM_TOKEN }} ghcr.io
           cd charts/shelf
           helm package --app-version ${{ needs.tag.outputs.semver }} .
