@@ -31,5 +31,4 @@ pub struct S3Configuration {
     pub region: String,
     pub access_key: String,
     pub secret_key: String,
-    pub insecure: bool,
 }

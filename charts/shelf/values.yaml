@@ -60,6 +60,15 @@ persistence:
   enabled: true
   storage: 10Gi
   storageClass: ""
+  # Set this to s3 if you want to store your packages in a s3 compatible storage
+  packageStorage: "local"
+  s3:
+    bucket: ""
+    host: ""
+    accessKey: ""
+    secretKey: ""
+    region: ""
+
 
 security:
   jwtSecret: ""
