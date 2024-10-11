@@ -121,7 +121,7 @@ jobs:
           filters: |
             chart:
               - 'charts/**'
-      - if: steps.changes.outputs.chart == true
+      - if: steps.changes.outputs.chart == 'true'
         run: |
           helm registry login -u klusoga -p ${{ secrets.HELM_TOKEN }} ghcr.io
           cd charts/shelf
