@@ -12,7 +12,6 @@ use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
-use log::debug;
 use s3::creds::Credentials;
 use s3::{Bucket, Region};
 use sqlx::postgres::PgPoolOptions;
@@ -77,7 +76,6 @@ async fn main() -> std::io::Result<()> {
                     .expect("Unable to parse s3 credentials"),
                 ) {
                     Ok(bucket) => {
-                        debug!("{:?}", bucket);
                         bucket
                     }
                     Err(err) => panic!("Unable to access bucket {}", err),

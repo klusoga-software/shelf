@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Repo } from "../models/repo.ts";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import {
 } from "@cloudscape-design/components";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
+import { NotificationContext } from "../components/NotificationProvider.tsx";
 
 function ReposPage() {
   const [repos, setRepos] = useState<Repo[]>([]);
@@ -34,9 +35,11 @@ function ReposPage() {
   const navigate = useNavigate();
 
   const auth = useAuth();
+  const notificationContext = useContext(NotificationContext);
+  const { showNotification } = notificationContext!;
 
   useEffect(() => {
-    if (auth.user){
+    if (auth.user) {
       load_repos();
     }
   }, [auth]);
@@ -50,6 +53,13 @@ function ReposPage() {
       .then((response) => {
         setRepos(response.data);
         setLoading(false);
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while load repos",
+          message: err.response?.data,
+        });
       });
   }
 
@@ -66,10 +76,22 @@ function ReposPage() {
       )
       .then(() => {
         setRepoType({ value: "Cargo" });
+        showNotification({
+          type: "success",
+          header: "Repository created!",
+          message: `Successfully created ${repoName}`,
+        });
         setRepoName("");
         setRepoPublic(false);
         load_repos();
         setShowModal(false);
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while delete Repo",
+          message: err.response?.data,
+        });
       });
   }
 
@@ -82,6 +104,13 @@ function ReposPage() {
         .then(() => {
           setSelectedRepo([]);
           load_repos();
+        })
+        .catch((err) => {
+          showNotification({
+            type: "error",
+            header: "Error while delete repo",
+            message: err.response?.data,
+          });
         });
     }
   }

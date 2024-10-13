@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Crate from "../models/crate.ts";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -9,6 +9,7 @@ import {
   Table,
 } from "@cloudscape-design/components";
 import { useAuth } from "react-oidc-context";
+import { NotificationContext } from "../components/NotificationProvider.tsx";
 
 function CratesPage() {
   const [crates, setCrates] = useState<Crate[]>([]);
@@ -17,6 +18,9 @@ function CratesPage() {
   const [selectedCrates, setSelectedCrates] = useState<Crate[]>([]);
 
   const auth = useAuth();
+
+  const notificationContext = useContext(NotificationContext);
+  const { showNotification } = notificationContext!;
 
   useEffect(() => {
     get_crates();
@@ -31,6 +35,13 @@ function CratesPage() {
       .then((res) => {
         setCrates(res.data);
         setLoading(false);
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while get crates",
+          message: err.response?.data,
+        });
       });
   }
 
@@ -43,6 +54,13 @@ function CratesPage() {
         .then(() => {
           get_crates();
           setSelectedCrates([]);
+        })
+        .catch((err) => {
+          showNotification({
+            type: "error",
+            header: "Error while delete crate",
+            message: err.response?.data,
+          });
         });
     }
   }

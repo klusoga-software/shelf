@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ import axios from "axios";
 import { Role } from "../models/role.ts";
 import { Repo } from "../models/repo.ts";
 import { useAuth } from "react-oidc-context";
+import { NotificationContext } from "../components/NotificationProvider.tsx";
 
 function ServiceAccountsPage() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,9 @@ function ServiceAccountsPage() {
 
   const auth = useAuth();
 
+  const notificationContext = useContext(NotificationContext);
+  const { showNotification } = notificationContext!;
+
   useEffect(() => {
     load_service_accounts();
     load_roles();
@@ -59,6 +63,13 @@ function ServiceAccountsPage() {
       .then((response) => {
         setServiceAccounts(response.data);
         setLoading(false);
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while get service accounts",
+          message: err.response?.data,
+        });
       });
   }
   function delete_service_account() {
@@ -69,6 +80,13 @@ function ServiceAccountsPage() {
         })
         .then(() => {
           load_service_accounts();
+        })
+        .catch((err) => {
+          showNotification({
+            type: "error",
+            header: "Error while delete service account",
+            message: err.response?.data,
+          });
         });
     }
   }
@@ -97,14 +115,21 @@ function ServiceAccountsPage() {
         setSelectedRepos([]);
         setShowModal(false);
         load_service_accounts();
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while create service account",
+          message: err.response?.data,
+        });
       });
   }
 
   function load_roles() {
     axios
-      .get<
-        Role[]
-      >("/api/roles", { headers: { Authorization: `Bearer ${auth.user?.access_token}` } })
+      .get<Role[]>("/api/roles", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
       .then((response) => {
         const newRoles = response.data.map((role) => ({
           label: role.name,
@@ -112,14 +137,21 @@ function ServiceAccountsPage() {
         }));
         setRoles(newRoles);
         setLoading(false); // We set loading false after the data is loaded
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while load roles",
+          message: err.response?.data,
+        });
       });
   }
 
   function load_repos() {
     axios
-      .get<
-        Repo[]
-      >("/api/repos", { headers: { Authorization: `Bearer ${auth.user?.access_token}` } })
+      .get<Repo[]>("/api/repos", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
       .then((response) => {
         const newRepos = response.data.map((repo) => ({
           label: repo.name,
@@ -127,6 +159,13 @@ function ServiceAccountsPage() {
         }));
         setRepos(newRepos);
         setLoading(false); // We set loading false after the data is loaded
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while load repos",
+          message: err.response?.data,
+        });
       });
   }
 
