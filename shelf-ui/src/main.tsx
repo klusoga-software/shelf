@@ -2,33 +2,36 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "@cloudscape-design/global-styles/index.css";
-import {BrowserRouter} from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
-import {AuthProvider, AuthProviderProps} from "react-oidc-context";
-import {WebStorageStateStore} from "oidc-client-ts";
+import { AuthProvider, AuthProviderProps } from "react-oidc-context";
+import { WebStorageStateStore } from "oidc-client-ts";
+import { NotificationProvider } from "./components/NotificationProvider.tsx";
 
-if (import.meta.env.MODE === 'development'){
-    axios.defaults.baseURL = "http://localhost:6300/";
+if (import.meta.env.MODE === "development") {
+  axios.defaults.baseURL = "http://localhost:6300/";
 }
 
-axios.get('/api/configuration').then((res) => {
-    axios.get(res.data.oidc_configuration_url).then((res) => {
-        const authProviderProps: AuthProviderProps ={
-            authority: res.data.issuer,
-            client_id: "shelf",
-            redirect_uri: document.location.origin + "/",
-            userStore: new WebStorageStateStore({ store: window.localStorage }),
-            scope: "openid email",
-        }
+axios.get("/api/configuration").then((res) => {
+  axios.get(res.data.oidc_configuration_url).then((res) => {
+    const authProviderProps: AuthProviderProps = {
+      authority: res.data.issuer,
+      client_id: "shelf",
+      redirect_uri: document.location.origin + "/",
+      userStore: new WebStorageStateStore({ store: window.localStorage }),
+      scope: "openid email",
+    };
 
-        createRoot(document.getElementById("root")!).render(
-            <StrictMode>
-                <AuthProvider {...authProviderProps}>
-                    <BrowserRouter>
-                        <App />
-                    </BrowserRouter>
-                </AuthProvider>
-            </StrictMode>,
-        );
-    })
-})
+    createRoot(document.getElementById("root")!).render(
+      <StrictMode>
+        <AuthProvider {...authProviderProps}>
+          <NotificationProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </NotificationProvider>
+        </AuthProvider>
+      </StrictMode>,
+    );
+  });
+});

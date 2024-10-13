@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build --outDir ../dist",
     "lint": "eslint .",
     "preview": "vite preview",
-    "format": "prettier src/**/*.tsx --write"
+    "format": "prettier src src/**/*.tsx --write"
   },
   "dependencies": {
     "@cloudscape-design/components": "^3.0.773",
