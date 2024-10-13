@@ -2,9 +2,10 @@ name: Build documentation
 
 on:
   push:
+    branches:
+      - develop
     paths:
       - docs/**
-  workflow_dispatch:
 
 permissions: write-all
 
