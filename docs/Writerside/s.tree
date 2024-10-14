@@ -9,5 +9,7 @@
     <toc-element topic="starter.md"/>
     <toc-element topic="Deployment.md">
         <toc-element topic="Keycloak.md"/>
+        <toc-element topic="Helm-Changelog.md"/>
     </toc-element>
+    <toc-element topic="Changelog.md"/>
 </instance-profile>
