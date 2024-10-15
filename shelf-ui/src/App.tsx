@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import { hasAuthParams, useAuth } from "react-oidc-context";
 import ServiceAccountsPage from "./pages/ServiceAccountsPage.tsx";
 import { NotificationContext } from "./components/NotificationProvider.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 
 function App() {
   const auth = useAuth();
@@ -37,8 +38,10 @@ function App() {
         contentType={"dashboard"}
         navigation={<Sidenav />}
         notifications={alerts()}
+        toolsHide={true}
         content={
           <Routes>
+            <Route path="/" element={<Dashboard />} />
             <Route path="/repos" element={<ReposPage />} />
             <Route path="/crates/:id" element={<CratesPage />} />
             <Route path="/service-accounts" element={<ServiceAccountsPage />} />

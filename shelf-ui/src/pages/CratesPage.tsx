@@ -23,7 +23,9 @@ function CratesPage() {
   const { showNotification } = notificationContext!;
 
   useEffect(() => {
-    get_crates();
+    if (auth.user) {
+      get_crates();
+    }
   }, [auth]);
 
   function get_crates() {
@@ -83,6 +85,7 @@ function CratesPage() {
           },
           { id: "name", header: "Name", cell: (crate) => crate.name },
           { id: "version", header: "Version", cell: (crate) => crate.version },
+          { id: "size", header: "Size", cell: (crate) => crate.crate_size },
         ]}
         header={
           <SpaceBetween size="m">

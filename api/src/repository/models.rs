@@ -34,6 +34,7 @@ pub struct Crate {
     pub version: String,
     pub repo_id: i32,
     pub index: Json<CrateIndex>,
+    pub crate_size: Option<i64>,
 }
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]

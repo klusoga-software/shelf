@@ -75,9 +75,7 @@ async fn main() -> std::io::Result<()> {
                     )
                     .expect("Unable to parse s3 credentials"),
                 ) {
-                    Ok(bucket) => {
-                        bucket
-                    }
+                    Ok(bucket) => bucket,
                     Err(err) => panic!("Unable to access bucket {}", err),
                 };
 
