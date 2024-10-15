@@ -53,3 +53,22 @@ pub struct Role {
     pub name: String,
     pub permissions: String,
 }
+
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
+pub struct Dashboard {
+    pub id: Option<i32>,
+    pub user_id: String,
+    pub tiles: Json<Vec<DashboardTile>>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DashboardTile {
+    pub header: String,
+    pub tile_type: TileType,
+    pub data: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TileType {
+    Count,
+}

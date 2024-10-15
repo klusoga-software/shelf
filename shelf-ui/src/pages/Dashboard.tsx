@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ButtonDropdown,
   Header,
   SpaceBetween,
 } from "@cloudscape-design/components";
@@ -20,11 +21,26 @@ function Dashboard() {
   return (
     <>
       <SpaceBetween size="m">
-        <Header variant="h1">Dashboard</Header>
+        <Header
+          variant="h1"
+          actions={
+            <SpaceBetween size="s">
+              <Button iconName="add-plus">Add Widget</Button>
+            </SpaceBetween>
+          }
+        >
+          Dashboard
+        </Header>
         <Board
           items={items}
           renderItem={(item) => (
             <BoardItem
+              settings={
+                <ButtonDropdown
+                  variant="icon"
+                  items={[{ id: "remove", text: "Remove" }]}
+                ></ButtonDropdown>
+              }
               header={<Header>{item.data.header}</Header>}
               i18nStrings={{
                 dragHandleAriaLabel: "Drag Handle",
@@ -45,6 +61,7 @@ function Dashboard() {
             liveAnnouncementItemRemoved: () => "",
           }}
           onItemsChange={(event) => {
+            console.log(event.detail.items);
             setItems(event.detail.items);
           }}
           empty={
