@@ -3,6 +3,8 @@ pub mod models;
 pub mod role_repository;
 pub mod service_accounts_repository;
 
+pub mod dashboards_repository;
+
 #[cfg(test)]
 mod database_tests {
     use test_helpers::{build_pool, build_postgres_database, migrate};
