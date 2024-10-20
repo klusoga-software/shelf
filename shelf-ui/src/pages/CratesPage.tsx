@@ -3,13 +3,16 @@ import Crate from "../models/crate.ts";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import {
+  AppLayout,
   Button,
+  ContentLayout,
   Header,
   SpaceBetween,
   Table,
 } from "@cloudscape-design/components";
 import { useAuth } from "react-oidc-context";
 import { NotificationContext } from "../components/NotificationProvider.tsx";
+import Sidenav from "../components/Sidenav.tsx";
 
 function CratesPage() {
   const [crates, setCrates] = useState<Crate[]>([]);
@@ -20,7 +23,7 @@ function CratesPage() {
   const auth = useAuth();
 
   const notificationContext = useContext(NotificationContext);
-  const { showNotification } = notificationContext!;
+  const { showNotification, alerts } = notificationContext!;
 
   useEffect(() => {
     if (auth.user) {
@@ -68,46 +71,59 @@ function CratesPage() {
   }
 
   return (
-    <>
-      <Table
-        items={crates}
-        selectionType={"multi"}
-        selectedItems={selectedCrates}
-        onSelectionChange={({ detail }) => {
-          setSelectedCrates(detail.selectedItems);
-        }}
-        columnDefinitions={[
-          {
-            id: "id",
-            header: "ID",
-            cell: (crate) => crate.id,
-            sortingField: "id",
-          },
-          { id: "name", header: "Name", cell: (crate) => crate.name },
-          { id: "version", header: "Version", cell: (crate) => crate.version },
-          { id: "size", header: "Size", cell: (crate) => crate.crate_size },
-        ]}
-        header={
-          <SpaceBetween size="m">
-            <Header
-              actions={
-                <SpaceBetween direction="horizontal" size="m">
-                  <Button
-                    disabled={selectedCrates.length == 0}
-                    onClick={delete_crate}
-                  >
-                    Delete Crates
-                  </Button>
-                </SpaceBetween>
-              }
-            >
-              Crates
-            </Header>
-          </SpaceBetween>
-        }
-        loading={loading}
-      ></Table>
-    </>
+    <AppLayout
+      contentType="table"
+      navigation={<Sidenav active="/repos" />}
+      notifications={alerts()}
+      toolsHide={true}
+      content={
+        <ContentLayout>
+          <Table
+            variant="full-page"
+            items={crates}
+            selectionType={"multi"}
+            selectedItems={selectedCrates}
+            onSelectionChange={({ detail }) => {
+              setSelectedCrates(detail.selectedItems);
+            }}
+            columnDefinitions={[
+              {
+                id: "id",
+                header: "ID",
+                cell: (crate) => crate.id,
+                sortingField: "id",
+              },
+              { id: "name", header: "Name", cell: (crate) => crate.name },
+              {
+                id: "version",
+                header: "Version",
+                cell: (crate) => crate.version,
+              },
+              { id: "size", header: "Size", cell: (crate) => crate.crate_size },
+            ]}
+            header={
+              <SpaceBetween size="m">
+                <Header
+                  actions={
+                    <SpaceBetween direction="horizontal" size="m">
+                      <Button
+                        disabled={selectedCrates.length == 0}
+                        onClick={delete_crate}
+                      >
+                        Delete Crates
+                      </Button>
+                    </SpaceBetween>
+                  }
+                >
+                  Crates
+                </Header>
+              </SpaceBetween>
+            }
+            loading={loading}
+          ></Table>
+        </ContentLayout>
+      }
+    ></AppLayout>
   );
 }
 

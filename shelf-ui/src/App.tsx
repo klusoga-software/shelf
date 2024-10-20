@@ -1,12 +1,10 @@
-import { AppLayout, TopNavigation } from "@cloudscape-design/components";
+import { TopNavigation } from "@cloudscape-design/components";
 import { Route, Routes } from "react-router-dom";
 import ReposPage from "./pages/ReposPage.tsx";
-import Sidenav from "./components/Sidenav.tsx";
 import CratesPage from "./pages/CratesPage.tsx";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { hasAuthParams, useAuth } from "react-oidc-context";
 import ServiceAccountsPage from "./pages/ServiceAccountsPage.tsx";
-import { NotificationContext } from "./components/NotificationProvider.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 
 function App() {
@@ -28,26 +26,15 @@ function App() {
     console.log(auth.user);
   }, [auth, hasTriedSignin]);
 
-  const notificationContext = useContext(NotificationContext);
-  const { alerts } = notificationContext!;
-
   return (
     <>
-      <TopNavigation identity={{ href: "ui", title: "Shelf" }}></TopNavigation>
-      <AppLayout
-        contentType={"dashboard"}
-        navigation={<Sidenav />}
-        notifications={alerts()}
-        toolsHide={true}
-        content={
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/repos" element={<ReposPage />} />
-            <Route path="/crates/:id" element={<CratesPage />} />
-            <Route path="/service-accounts" element={<ServiceAccountsPage />} />
-          </Routes>
-        }
-      ></AppLayout>
+      <TopNavigation identity={{ href: "/", title: "Shelf" }}></TopNavigation>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/repos" element={<ReposPage />} />
+        <Route path="/crates/:id" element={<CratesPage />} />
+        <Route path="/service-accounts" element={<ServiceAccountsPage />} />
+      </Routes>
     </>
   );
 }

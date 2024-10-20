@@ -1,9 +1,7 @@
 import { SideNavigation } from "@cloudscape-design/components";
 import { useNavigate } from "react-router-dom";
-import React from "react";
 
-function Sidenav() {
-  const [active, setActive] = React.useState("/");
+const Sidenav = ({ active }: { active: string }) => {
   const navigate = useNavigate();
 
   function onFollow(href: string) {
@@ -16,7 +14,6 @@ function Sidenav() {
       onFollow={(event) => {
         if (!event.detail.external) {
           event.preventDefault();
-          setActive(event.detail.href);
           onFollow(event.detail.href);
         }
       }}
@@ -27,6 +24,6 @@ function Sidenav() {
       ]}
     />
   );
-}
+};
 
 export default Sidenav;

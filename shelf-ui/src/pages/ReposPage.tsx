@@ -2,8 +2,10 @@ import axios from "axios";
 import { Repo } from "../models/repo.ts";
 import { useContext, useEffect, useState } from "react";
 import {
+  AppLayout,
   Box,
   Button,
+  ContentLayout,
   CopyToClipboard,
   FormField,
   Header,
@@ -19,6 +21,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 import { NotificationContext } from "../components/NotificationProvider.tsx";
+import Sidenav from "../components/Sidenav.tsx";
 
 function ReposPage() {
   const [repos, setRepos] = useState<Repo[]>([]);
@@ -36,7 +39,7 @@ function ReposPage() {
 
   const auth = useAuth();
   const notificationContext = useContext(NotificationContext);
-  const { showNotification } = notificationContext!;
+  const { showNotification, alerts } = notificationContext!;
 
   useEffect(() => {
     if (auth.user) {
@@ -124,120 +127,150 @@ function ReposPage() {
   }
 
   return (
-    <>
-      <Modal
-        visible={showModal}
-        onDismiss={() => setShowModal(false)}
-        header="Create Repository"
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button variant="primary" onClick={() => create_repo()}>
-                Create
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-      >
-        <SpaceBetween size="m">
-          <FormField label="Name">
-            <SpaceBetween alignItems="center" size="xs" direction="horizontal">
-              <Input
-                value={repoName}
-                onChange={({ detail }) => setRepoName(detail.value)}
-              />
-            </SpaceBetween>
-          </FormField>
-
-          <FormField label="Type">
-            <SpaceBetween alignItems="center" size="xs" direction="horizontal">
-              <Select
-                options={selectOptions}
-                selectedOption={repoType}
-                onChange={({ detail }) => setRepoType(detail.selectedOption)}
-              />
-            </SpaceBetween>
-          </FormField>
-          <FormField label="Public">
-            <SpaceBetween alignItems="center" size="xs" direction="horizontal">
-              <Toggle
-                checked={repoPublic}
-                onChange={() => setRepoPublic(!repoPublic)}
-              />
-            </SpaceBetween>
-          </FormField>
-        </SpaceBetween>
-      </Modal>
-      <Table
-        items={repos}
-        selectionType={"multi"}
-        selectedItems={selectedRepo}
-        onSelectionChange={({ detail }) => {
-          setSelectedRepo(detail.selectedItems);
-        }}
-        columnDefinitions={[
-          {
-            id: "id",
-            header: "ID",
-            cell: (repo) => (
-              <Link
-                onFollow={(e) => {
-                  e.preventDefault();
-                  switch (repo.repo_type) {
-                    case "Cargo":
-                      navigate(`/crates/${repo.id}`);
-                  }
-                }}
-              >
-                {repo.id}
-              </Link>
-            ),
-            sortingField: "id",
-          },
-          { id: "name", header: "Name", cell: (repo) => repo.name },
-          { id: "repo_type", header: "Type", cell: (repo) => repo.repo_type },
-          {
-            id: "public",
-            header: "Public",
-            cell: (repo) => String(repo.public),
-          },
-          {
-            id: "action",
-            header: "config",
-            cell: (repo) => (
-              <CopyToClipboard
-                variant="inline"
-                textToCopy={receive_config(repo)}
-                copySuccessText="Config copied"
-                copyErrorText="Could not copy config"
-              />
-            ),
-          },
-        ]}
-        header={
-          <SpaceBetween size="m">
-            <Header
-              actions={
-                <SpaceBetween direction="horizontal" size="m">
-                  <Button
-                    disabled={selectedRepo.length == 0}
-                    onClick={delete_repos}
-                  >
-                    Delete Repositories
-                  </Button>
-                  <Button variant={"primary"} onClick={show_create_repo_dialog}>
-                    Create Repository
+    <AppLayout
+      contentType="table"
+      navigation={<Sidenav active="/repos" />}
+      notifications={alerts()}
+      toolsHide={true}
+      content={
+        <ContentLayout>
+          <Modal
+            visible={showModal}
+            onDismiss={() => setShowModal(false)}
+            header="Create Repository"
+            footer={
+              <Box float="right">
+                <SpaceBetween direction="horizontal" size="xs">
+                  <Button variant="primary" onClick={() => create_repo()}>
+                    Create
                   </Button>
                 </SpaceBetween>
-              }
-            >
-              Repositories
-            </Header>
-          </SpaceBetween>
-        }
-        loading={loading}
-      ></Table>
-    </>
+              </Box>
+            }
+          >
+            <SpaceBetween size="m">
+              <FormField label="Name">
+                <SpaceBetween
+                  alignItems="center"
+                  size="xs"
+                  direction="horizontal"
+                >
+                  <Input
+                    value={repoName}
+                    onChange={({ detail }) => setRepoName(detail.value)}
+                  />
+                </SpaceBetween>
+              </FormField>
+
+              <FormField label="Type">
+                <SpaceBetween
+                  alignItems="center"
+                  size="xs"
+                  direction="horizontal"
+                >
+                  <Select
+                    options={selectOptions}
+                    selectedOption={repoType}
+                    onChange={({ detail }) =>
+                      setRepoType(detail.selectedOption)
+                    }
+                  />
+                </SpaceBetween>
+              </FormField>
+              <FormField label="Public">
+                <SpaceBetween
+                  alignItems="center"
+                  size="xs"
+                  direction="horizontal"
+                >
+                  <Toggle
+                    checked={repoPublic}
+                    onChange={() => setRepoPublic(!repoPublic)}
+                  />
+                </SpaceBetween>
+              </FormField>
+            </SpaceBetween>
+          </Modal>
+          <Table
+            items={repos}
+            variant="full-page"
+            selectionType={"multi"}
+            selectedItems={selectedRepo}
+            onSelectionChange={({ detail }) => {
+              setSelectedRepo(detail.selectedItems);
+            }}
+            columnDefinitions={[
+              {
+                id: "id",
+                header: "ID",
+                cell: (repo) => (
+                  <Link
+                    onFollow={(e) => {
+                      e.preventDefault();
+                      switch (repo.repo_type) {
+                        case "Cargo":
+                          navigate(`/crates/${repo.id}`);
+                      }
+                    }}
+                  >
+                    {repo.id}
+                  </Link>
+                ),
+                sortingField: "id",
+              },
+              { id: "name", header: "Name", cell: (repo) => repo.name },
+              {
+                id: "repo_type",
+                header: "Type",
+                cell: (repo) => repo.repo_type,
+              },
+              {
+                id: "public",
+                header: "Public",
+                cell: (repo) => String(repo.public),
+              },
+              {
+                id: "action",
+                header: "config",
+                cell: (repo) => (
+                  <CopyToClipboard
+                    variant="inline"
+                    textToCopy={receive_config(repo)}
+                    copySuccessText="Config copied"
+                    copyErrorText="Could not copy config"
+                  />
+                ),
+              },
+            ]}
+            header={
+              <SpaceBetween size="m">
+                <Header
+                  actions={
+                    <SpaceBetween direction="horizontal" size="m">
+                      <Button
+                        disabled={selectedRepo.length == 0}
+                        onClick={delete_repos}
+                      >
+                        Delete Repositories
+                      </Button>
+                      <Button
+                        variant={"primary"}
+                        onClick={show_create_repo_dialog}
+                      >
+                        Create Repository
+                      </Button>
+                    </SpaceBetween>
+                  }
+                >
+                  Repositories
+                </Header>
+              </SpaceBetween>
+            }
+            loading={loading}
+          ></Table>
+        </ContentLayout>
+      }
+    ></AppLayout>
   );
 }
 
