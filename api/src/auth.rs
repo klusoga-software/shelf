@@ -107,8 +107,9 @@ fn get_repository_name(path: &str) -> String {
     strings[2].to_string()
 }
 
+#[derive(Debug)]
 pub struct User {
-    _claims: ApiClaims,
+    pub claims: ApiClaims,
 }
 
 impl FromRequest for User {
@@ -169,7 +170,7 @@ impl FromRequest for User {
                 .map_err(actix_web::error::ErrorUnauthorized)?;
 
             Ok(User {
-                _claims: claim.claims,
+                claims: claim.claims,
             })
         })
     }

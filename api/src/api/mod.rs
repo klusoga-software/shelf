@@ -1,5 +1,6 @@
 use crate::api::configuration::get_configuration;
 use crate::api::crate_controller::crate_controller;
+use crate::api::dashboard_controller::dashboard_controller;
 use crate::api::health_controller::get_health;
 use crate::api::repo_controller::repo_controller;
 use crate::api::role_controller::role_controller;
@@ -9,6 +10,7 @@ use actix_web::Scope;
 pub mod cargo;
 pub mod configuration;
 pub mod crate_controller;
+mod dashboard_controller;
 pub mod health_controller;
 mod macros;
 pub mod models;
@@ -24,4 +26,5 @@ pub fn api_scope() -> Scope {
         .service(get_configuration)
         .service(service_account_controller())
         .service(role_controller())
+        .service(dashboard_controller())
 }

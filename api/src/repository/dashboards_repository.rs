@@ -12,8 +12,8 @@ impl DashboardsRepository {
         Self { pool }
     }
 
-    pub async fn create_dashboard(&self, dashboard: Dashboard) -> Result<PgQueryResult, Error> {
-        sqlx::query(r#"insert into dashboards (user_id, tiles) values ($1, $2)"#)
+    pub async fn set_dashboard(&self, dashboard: Dashboard) -> Result<PgQueryResult, Error> {
+        sqlx::query(r#"insert into dashboards (user_id, tiles) values ($1, $2) on conflict (user_id) do update set tiles = excluded.tiles"#)
             .bind(dashboard.user_id)
             .bind(dashboard.tiles)
             .execute(&self.pool)
@@ -38,7 +38,7 @@ mod tests {
 
         migrate(&pool).await;
 
-        repo.create_dashboard(Dashboard {
+        repo.set_dashboard(Dashboard {
             id: None,
             user_id: "001".to_owned(),
             tiles: Json(vec![DashboardTile {

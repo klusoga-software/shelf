@@ -1,6 +1,7 @@
-use crate::repository::models::RepositoryType;
+use crate::repository::models::{DashboardTile, RepositoryType};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::types::Json;
 
 #[derive(Serialize, Deserialize)]
 pub struct ErrorResponse {
@@ -24,4 +25,9 @@ pub struct CreateServiceAccount {
     pub name: String,
     pub expired_at: Option<DateTime<Utc>>,
     pub repo_list: Vec<(i32, i32)>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CreateDashboardRequest {
+    pub tiles: Json<Vec<DashboardTile>>,
 }

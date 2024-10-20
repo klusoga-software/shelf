@@ -11,6 +11,7 @@ pub struct ServiceAccountClaims {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiClaims {
     pub name: String,
+    pub sub: String,
 }
 
 #[cfg(test)]

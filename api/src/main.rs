@@ -2,6 +2,7 @@ use crate::api::api_scope;
 use crate::api::cargo::get_cargo_scope;
 use crate::configuration::Configuration;
 use crate::repository::cargo_repository::CargoRepository;
+use crate::repository::dashboards_repository::DashboardsRepository;
 use crate::repository::role_repository::RoleRepository;
 use crate::repository::service_accounts_repository::ServiceAccountsRepository;
 use crate::storage::local::LocalStorage;
@@ -42,6 +43,7 @@ async fn main() -> std::io::Result<()> {
     let cargo_repository = CargoRepository::new(pool.clone());
     let service_account_repository = ServiceAccountsRepository::new(pool.clone());
     let role_repository = RoleRepository::new(pool.clone());
+    let dashboard_repository = DashboardsRepository::new(pool.clone());
 
     let binding = env::var("HTTP_BINDING").unwrap_or("0.0.0.0:6300".to_string());
 
@@ -98,6 +100,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(cargo_repository.clone()))
             .app_data(Data::new(service_account_repository.clone()))
             .app_data(Data::new(role_repository.clone()))
+            .app_data(Data::new(dashboard_repository.clone()))
             .app_data(Data::new(storage))
             .app_data(Data::new(load_configuration()))
             .service(get_cargo_scope())
