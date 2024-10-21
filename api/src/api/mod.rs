@@ -11,6 +11,7 @@ pub mod cargo;
 pub mod configuration;
 pub mod crate_controller;
 mod dashboard_controller;
+mod dashboard_data;
 pub mod health_controller;
 mod macros;
 pub mod models;

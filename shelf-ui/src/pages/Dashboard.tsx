@@ -25,7 +25,10 @@ function Dashboard() {
   >([
     {
       id: "count",
-      data: { content: <CountWidget></CountWidget>, header: "Repo Count" },
+      data: {
+        content: <CountWidget count={0}></CountWidget>,
+        header: "Repo Count",
+      },
     },
   ]);
 

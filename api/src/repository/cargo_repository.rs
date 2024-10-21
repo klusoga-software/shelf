@@ -22,6 +22,18 @@ impl CargoRepository {
         .await
     }
 
+    pub async fn get_repo_count(&self) -> Result<i64, Error> {
+        sqlx::query_scalar::<_, i64>("select count(*)::bigint from repos")
+            .fetch_one(&self.pool)
+            .await
+    }
+
+    pub async fn get_crates_size(&self) -> Result<i64, Error> {
+        sqlx::query_scalar::<_, i64>("select sum(crate_size)::bigint from crates")
+            .fetch_one(&self.pool)
+            .await
+    }
+
     pub async fn delete_crate(&self, crate_id: &i32) -> Result<PgQueryResult, Error> {
         sqlx::query(r#"delete from crates where id = $1"#)
             .bind(crate_id)

@@ -24,7 +24,7 @@ impl DashboardsRepository {
 #[cfg(test)]
 mod tests {
     use crate::repository::dashboards_repository::DashboardsRepository;
-    use crate::repository::models::{Dashboard, DashboardTile, TileType};
+    use crate::repository::models::{Dashboard, DashboardTile};
     use sqlx::types::Json;
     use test_helpers::{build_pool, build_postgres_database, migrate};
 
@@ -42,9 +42,10 @@ mod tests {
             id: None,
             user_id: "001".to_owned(),
             tiles: Json(vec![DashboardTile {
-                header: "Test".to_owned(),
-                tile_type: TileType::Count,
-                data: "1".to_owned(),
+                id: "Test".to_string(),
+                row_span: None,
+                column_span: None,
+                column_offset: None,
             }]),
         })
         .await

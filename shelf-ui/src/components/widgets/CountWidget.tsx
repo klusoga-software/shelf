@@ -1,11 +1,11 @@
 import { Link } from "@cloudscape-design/components";
 
-function CountWidget() {
+const CountWidget = ({ count }: { count: number }) => {
   return (
     <Link href="repo" variant="awsui-value-large">
-      0
+      {count}
     </Link>
   );
-}
+};
 
 export default CountWidget;
