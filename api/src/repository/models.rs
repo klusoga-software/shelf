@@ -2,6 +2,7 @@ use crate::api::cargo::models::CrateIndex;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
+use std::collections::HashMap;
 
 #[derive(sqlx::Type, Serialize, Deserialize, Clone)]
 #[repr(i32)]
@@ -63,12 +64,8 @@ pub struct Dashboard {
 
 #[derive(Serialize, Deserialize)]
 pub struct DashboardTile {
-    pub header: String,
-    pub tile_type: TileType,
-    pub data: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum TileType {
-    Count,
+    pub id: String,
+    pub row_span: Option<i8>,
+    pub column_span: Option<i8>,
+    pub column_offset: Option<HashMap<i8, i8>>,
 }
