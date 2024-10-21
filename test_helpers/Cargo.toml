@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 testcontainers = "0.23.1"
-testcontainers-modules = {version = "0.11.2", features = ["postgres"]}
+testcontainers-modules = {version = "0.11.3", features = ["postgres"]}
 sqlx = {version = "0.8.2", features = ["runtime-tokio", "postgres", "json", "chrono"]}
