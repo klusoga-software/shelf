@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Default, Clone)]
 pub struct DashboardData {
+    #[serde(rename = "repoCount")]
     pub repo_count: i64,
     pub storage: i64,
 }
