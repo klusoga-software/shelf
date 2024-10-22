@@ -36,6 +36,6 @@ updates:
     schedule:
       interval: daily
     groups:
-      pnpm:
+      npm:
         patterns:
           - "*"
