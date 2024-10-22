@@ -1,8 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import {
+  AppLayout,
   Box,
   Button,
   Checkbox,
+  ContentLayout,
   CopyToClipboard,
   DatePicker,
   FormField,
@@ -21,9 +23,11 @@ import { Role } from "../models/role.ts";
 import { Repo } from "../models/repo.ts";
 import { useAuth } from "react-oidc-context";
 import { NotificationContext } from "../components/NotificationProvider.tsx";
+import Sidenav from "../components/Sidenav.tsx";
 
 function ServiceAccountsPage() {
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [serviceAccounts, setServiceAccounts] = useState<ServiceAccount[]>([]);
   const [selectedServiceAccounts, setSelectedServiceAccounts] = useState<
     ServiceAccount[]
@@ -46,7 +50,7 @@ function ServiceAccountsPage() {
   const auth = useAuth();
 
   const notificationContext = useContext(NotificationContext);
-  const { showNotification } = notificationContext!;
+  const { showNotification, alerts } = notificationContext!;
 
   useEffect(() => {
     load_service_accounts();
@@ -73,12 +77,14 @@ function ServiceAccountsPage() {
       });
   }
   function delete_service_account() {
+    setButtonLoading(true);
     for (const sa of selectedServiceAccounts) {
       axios
         .delete(`/api/service-accounts/${sa.id}`, {
           headers: { Authorization: `Bearer ${auth.user?.access_token}` },
         })
         .then(() => {
+          setButtonLoading(false);
           load_service_accounts();
         })
         .catch((err) => {
@@ -193,143 +199,164 @@ function ServiceAccountsPage() {
   }
 
   return (
-    <>
-      <Modal
-        visible={showSecretModal}
-        onDismiss={() => setShowSecretModal(false)}
-        header="Service Account Credentials"
-        footer={
-          <Box>
-            <SpaceBetween size="xs" direction="horizontal">
-              <Button onClick={() => setShowSecretModal(false)}>Ok</Button>
+    <AppLayout
+      contentType="table"
+      navigation={<Sidenav active="/service-accounts" />}
+      notifications={alerts()}
+      toolsHide={true}
+      content={
+        <ContentLayout>
+          <Modal
+            visible={showSecretModal}
+            onDismiss={() => setShowSecretModal(false)}
+            header="Service Account Credentials"
+            footer={
+              <Box>
+                <SpaceBetween size="xs" direction="horizontal">
+                  <Button onClick={() => setShowSecretModal(false)}>Ok</Button>
+                </SpaceBetween>
+              </Box>
+            }
+          >
+            <SpaceBetween size="m">
+              <FormField label="Secret">
+                <CopyToClipboard
+                  variant="inline"
+                  textToCopy={secret}
+                  copySuccessText="Secret copied"
+                  copyErrorText="Error while copy secret"
+                ></CopyToClipboard>
+              </FormField>
             </SpaceBetween>
-          </Box>
-        }
-      >
-        <SpaceBetween size="m">
-          <FormField label="Secret">
-            <CopyToClipboard
-              variant="inline"
-              textToCopy={secret}
-              copySuccessText="Secret copied"
-              copyErrorText="Error while copy secret"
-            ></CopyToClipboard>
-          </FormField>
-        </SpaceBetween>
-      </Modal>
-      <Modal
-        header="Create Service Account"
-        onDismiss={() => setShowModal(false)}
-        visible={showModal}
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button
-                variant="primary"
-                onClick={() => create_service_account()}
-              >
-                Create
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-      >
-        <SpaceBetween size="m">
-          <FormField label="Name">
-            <Input
-              onChange={({ detail }) => setName(detail.value)}
-              value={name}
-            ></Input>
-          </FormField>
-          <SpaceBetween alignItems="center" size="xxl" direction="horizontal">
-            <FormField label="Expiration">
-              <DatePicker
-                disabled={noExpiration}
-                onChange={({ detail }) => {
-                  const date = new Date(detail.value);
-                  setExpiration(date.toISOString());
-                }}
-                value={expiration}
-              ></DatePicker>
-            </FormField>
-            <FormField label="No Expiration">
-              <Checkbox
-                onChange={({ detail }) => {
-                  setNoExpiration(detail.checked);
-                }}
-                checked={noExpiration}
-              ></Checkbox>
-            </FormField>
-          </SpaceBetween>
-          <FormField label="Repos">
-            <Multiselect
-              onChange={({ detail }) =>
-                setSelectedRepos(detail.selectedOptions)
-              }
-              options={repos}
-              selectedOptions={selectedRepos}
-            ></Multiselect>
-          </FormField>
-          {repo_roles()}
-        </SpaceBetween>
-      </Modal>
-      <Table
-        header={
-          <SpaceBetween size="m">
-            <Header
-              actions={
-                <SpaceBetween direction="horizontal" size="m">
+          </Modal>
+          <Modal
+            header="Create Service Account"
+            onDismiss={() => setShowModal(false)}
+            visible={showModal}
+            footer={
+              <Box float="right">
+                <SpaceBetween direction="horizontal" size="xs">
                   <Button
-                    disabled={selectedServiceAccounts.length == 0}
-                    onClick={delete_service_account}
+                    variant="primary"
+                    onClick={() => create_service_account()}
                   >
-                    Delete Service Accounts
-                  </Button>
-                  <Button variant="primary" onClick={() => setShowModal(true)}>
-                    Create Service Account
+                    Create
                   </Button>
                 </SpaceBetween>
-              }
-            >
-              Service Accounts
-            </Header>
-          </SpaceBetween>
-        }
-        loading={loading}
-        selectedItems={selectedServiceAccounts}
-        items={serviceAccounts}
-        selectionType={"multi"}
-        onSelectionChange={({ detail }) =>
-          setSelectedServiceAccounts(detail.selectedItems)
-        }
-        columnDefinitions={[
-          {
-            id: "id",
-            header: "ID",
-            cell: (sa) => sa.id,
-            sortingField: "id",
-          },
-          { id: "name", header: "Name", cell: (sa) => sa.name },
-          {
-            id: "created_at",
-            header: "Created At",
-            cell: (sa) => sa.created_at.toString(),
-          },
-          {
-            id: "updated_at",
-            header: "Updated At",
-            cell: (sa) => sa.updated_at.toString(),
-          },
-          {
-            id: "expires_at",
-            header: "Expires At",
-            cell: (sa) =>
-              sa.expires_at ? sa.expires_at.toString() : "No expiration",
-          },
-          { id: "repo_count", header: "Repos", cell: (sa) => sa.repo_count },
-        ]}
-      ></Table>
-    </>
+              </Box>
+            }
+          >
+            <SpaceBetween size="m">
+              <FormField label="Name">
+                <Input
+                  onChange={({ detail }) => setName(detail.value)}
+                  value={name}
+                ></Input>
+              </FormField>
+              <SpaceBetween
+                alignItems="center"
+                size="xxl"
+                direction="horizontal"
+              >
+                <FormField label="Expiration">
+                  <DatePicker
+                    disabled={noExpiration}
+                    onChange={({ detail }) => {
+                      const date = new Date(detail.value);
+                      setExpiration(date.toISOString());
+                    }}
+                    value={expiration}
+                  ></DatePicker>
+                </FormField>
+                <FormField label="No Expiration">
+                  <Checkbox
+                    onChange={({ detail }) => {
+                      setNoExpiration(detail.checked);
+                    }}
+                    checked={noExpiration}
+                  ></Checkbox>
+                </FormField>
+              </SpaceBetween>
+              <FormField label="Repos">
+                <Multiselect
+                  onChange={({ detail }) =>
+                    setSelectedRepos(detail.selectedOptions)
+                  }
+                  options={repos}
+                  selectedOptions={selectedRepos}
+                ></Multiselect>
+              </FormField>
+              {repo_roles()}
+            </SpaceBetween>
+          </Modal>
+          <Table
+            variant="full-page"
+            header={
+              <SpaceBetween size="m">
+                <Header
+                  actions={
+                    <SpaceBetween direction="horizontal" size="m">
+                      <Button
+                        loading={buttonLoading}
+                        disabled={selectedServiceAccounts.length == 0}
+                        onClick={delete_service_account}
+                      >
+                        Delete Service Accounts
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowModal(true)}
+                      >
+                        Create Service Account
+                      </Button>
+                    </SpaceBetween>
+                  }
+                >
+                  Service Accounts
+                </Header>
+              </SpaceBetween>
+            }
+            loading={loading}
+            selectedItems={selectedServiceAccounts}
+            items={serviceAccounts}
+            selectionType={"multi"}
+            onSelectionChange={({ detail }) =>
+              setSelectedServiceAccounts(detail.selectedItems)
+            }
+            columnDefinitions={[
+              {
+                id: "id",
+                header: "ID",
+                cell: (sa) => sa.id,
+                sortingField: "id",
+              },
+              { id: "name", header: "Name", cell: (sa) => sa.name },
+              {
+                id: "created_at",
+                header: "Created At",
+                cell: (sa) => sa.created_at.toString(),
+              },
+              {
+                id: "updated_at",
+                header: "Updated At",
+                cell: (sa) => sa.updated_at.toString(),
+              },
+              {
+                id: "expires_at",
+                header: "Expires At",
+                cell: (sa) =>
+                  sa.expires_at ? sa.expires_at.toString() : "No expiration",
+              },
+              {
+                id: "repo_count",
+                header: "Repos",
+                cell: (sa) => sa.repo_count,
+              },
+            ]}
+          ></Table>
+        </ContentLayout>
+      }
+    ></AppLayout>
   );
 }
 

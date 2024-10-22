@@ -9,6 +9,7 @@ updates:
       cargo:
         patterns:
           - "*"
+
   - directory: /
     package-ecosystem: docker
     target-branch: develop
@@ -18,6 +19,7 @@ updates:
       docker:
         patterns:
           - "*"
+
   - directory: /
     package-ecosystem: github-actions
     target-branch: develop
@@ -28,3 +30,12 @@ updates:
         patterns:
           - "*"
 
+  - directory: /shelf-ui
+    package-ecosystem: pnpm
+    target-branch: develop
+    schedule:
+      interval: daily
+    groups:
+      pnpm:
+        patterns:
+          - "*"

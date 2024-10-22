@@ -15,11 +15,23 @@ impl CargoRepository {
 
     pub async fn list_crates_for_repo(&self, repo_id: i32) -> Result<Vec<Crate>, Error> {
         sqlx::query_as::<_, Crate>(
-            r#"SELECT id, name, path, version, repo_id, index from crates where repo_id = $1"#,
+            r#"SELECT id, name, path, version, repo_id, index, crate_size from crates where repo_id = $1"#,
         )
         .bind(repo_id)
         .fetch_all(&self.pool)
         .await
+    }
+
+    pub async fn get_repo_count(&self) -> Result<i64, Error> {
+        sqlx::query_scalar::<_, i64>("select count(*)::bigint from repos")
+            .fetch_one(&self.pool)
+            .await
+    }
+
+    pub async fn get_crates_size(&self) -> Result<i64, Error> {
+        sqlx::query_scalar::<_, i64>("select coalesce(sum(crate_size)::bigint, 0) from crates;")
+            .fetch_one(&self.pool)
+            .await
     }
 
     pub async fn delete_crate(&self, crate_id: &i32) -> Result<PgQueryResult, Error> {
@@ -92,7 +104,7 @@ impl CargoRepository {
     pub async fn add_index(&self, crate_row: Crate) -> Result<PgRow, Error> {
         sqlx::query(
             r#"
-insert into crates (name, repo_id, version, path, index) values ($1, $2, $3, $4, $5)
+insert into crates (name, repo_id, version, path, index, crate_size) values ($1, $2, $3, $4, $5, $6)
 RETURNING id
         "#,
         )
@@ -101,6 +113,7 @@ RETURNING id
         .bind(crate_row.version)
         .bind(crate_row.path)
         .bind(crate_row.index)
+        .bind(crate_row.crate_size)
         .fetch_one(&self.pool)
         .await
     }
@@ -111,7 +124,7 @@ RETURNING id
         id: &i32,
     ) -> Result<Vec<Crate>, Error> {
         sqlx::query_as::<_, Crate>(
-            r#"select id, name, path, repo_id, version, index from crates where name = $1 and repo_id = $2"#,
+            r#"select id, name, path, repo_id, version, index, crate_size from crates where name = $1 and repo_id = $2"#,
         )
         .bind(name)
         .bind(id)
@@ -121,7 +134,7 @@ RETURNING id
 
     pub async fn get_index_by_id(&self, id: &i32) -> Result<Crate, Error> {
         sqlx::query_as::<_, Crate>(
-            r#"select id, name, path, repo_id, version, index from crates where id = $1"#,
+            r#"select id, name, path, repo_id, version, index, crate_size from crates where id = $1"#,
         )
         .bind(id)
         .fetch_one(&self.pool)
@@ -142,7 +155,7 @@ RETURNING id
         );
 
         sqlx::query_as::<_, Crate>(
-            r#"select id, name, path, repo_id, version, index from crates where name = $1 and repo_id = $2 and version = $3"#,
+            r#"select id, name, path, repo_id, version, index, crate_size from crates where name = $1 and repo_id = $2 and version = $3"#,
         )
             .bind(name)
             .bind(id)

@@ -56,6 +56,7 @@ pub async fn upload(
             path: crate_path.clone(),
             repo_id: repo.id.unwrap(),
             id: None,
+            crate_size: Some(crate_file.len() as i64),
         })
         .await
     {

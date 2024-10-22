@@ -2,6 +2,7 @@ use crate::api::cargo::models::CrateIndex;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
+use std::collections::HashMap;
 
 #[derive(sqlx::Type, Serialize, Deserialize, Clone)]
 #[repr(i32)]
@@ -34,6 +35,7 @@ pub struct Crate {
     pub version: String,
     pub repo_id: i32,
     pub index: Json<CrateIndex>,
+    pub crate_size: Option<i64>,
 }
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
@@ -51,4 +53,22 @@ pub struct Role {
     pub id: Option<i32>,
     pub name: String,
     pub permissions: String,
+}
+
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
+pub struct Dashboard {
+    pub id: Option<i32>,
+    pub user_id: String,
+    pub tiles: Json<Vec<DashboardTile>>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DashboardTile {
+    pub id: String,
+    #[serde(rename = "rowSpan")]
+    pub row_span: Option<i8>,
+    #[serde(rename = "columnSpan")]
+    pub column_span: Option<i8>,
+    #[serde(rename = "columnOffset")]
+    pub column_offset: Option<HashMap<i8, i8>>,
 }

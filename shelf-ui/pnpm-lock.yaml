@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@cloudscape-design/board-components':
+        specifier: ^3.0.81
+        version: 3.0.81(@cloudscape-design/components@3.0.773(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cloudscape-design/components':
         specifier: ^3.0.773
         version: 3.0.773(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -167,6 +170,14 @@ packages:
     resolution: {integrity: sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==}
     engines: {node: '>=6.9.0'}
 
+  '@cloudscape-design/board-components@3.0.81':
+    resolution: {integrity: sha512-i8Iv1u5KGlP6FzrPlXJtzBq8ELXqcxeaErM8VmKqrP7yc4/7mKR7mivKg5RbUnF9ocYwDH25azX+6FGWElLRkw==}
+    peerDependencies:
+      '@cloudscape-design/components': ^3
+      '@cloudscape-design/design-tokens': ^3
+      react: ^18.2.0
+      react-dom: ^18.2.0
+
   '@cloudscape-design/collection-hooks@1.0.54':
     resolution: {integrity: sha512-cp2uobsYkVgjneXhD2kD+VTRibtOVzixKx9W2s2B7dWdP1rMSB/3OFdnKWM53KHdZkjdXABahZtJwnXVs9XHXQ==}
     peerDependencies:
@@ -180,6 +191,9 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17 || ^18
       react-dom: ^16.8 || ^17 || ^18
+
+  '@cloudscape-design/design-tokens@3.0.44':
+    resolution: {integrity: sha512-Rn1r9JsGKbS8bjWMbpCEzDPokuhVVmSnbxgYzZgd9iSNSnWTHASF3GJlzfp6anglrpaJG/q3/lJstCGa6DKM+w==}
 
   '@cloudscape-design/global-styles@1.0.32':
     resolution: {integrity: sha512-3X7YEnzB7U0HeWS2iGIXWgdUAfloWVm+skzJlFkj0MNGIZ7jpI5rH9u9jLFsS021a4WrpK12FM+cwgLjzAq03A==}
@@ -1451,6 +1465,17 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
+  '@cloudscape-design/board-components@3.0.81(@cloudscape-design/components@3.0.773(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@cloudscape-design/component-toolkit': 1.0.0-beta.74
+      '@cloudscape-design/components': 3.0.773(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@cloudscape-design/design-tokens': 3.0.44
+      '@cloudscape-design/test-utils-core': 1.0.44
+      '@dnd-kit/utilities': 3.2.2(react@18.3.1)
+      clsx: 1.2.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@cloudscape-design/collection-hooks@1.0.54(react@18.3.1)':
     dependencies:
       react: 18.3.1
@@ -1483,6 +1508,8 @@ snapshots:
       react-transition-group: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tslib: 2.7.0
       weekstart: 1.1.0
+
+  '@cloudscape-design/design-tokens@3.0.44': {}
 
   '@cloudscape-design/global-styles@1.0.32': {}
 
