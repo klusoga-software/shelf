@@ -31,11 +31,11 @@ updates:
           - "*"
 
   - directory: /shelf-ui
-    package-ecosystem: pnpm
+    package-ecosystem: npm
     target-branch: develop
     schedule:
       interval: daily
     groups:
-      pnpm:
+      npm:
         patterns:
           - "*"
