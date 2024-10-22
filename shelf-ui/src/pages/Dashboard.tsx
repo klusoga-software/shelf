@@ -21,6 +21,7 @@ import axios from "axios";
 import { useAuth } from "react-oidc-context";
 import { DashboardData } from "../models/dashboard-data.ts";
 import { DashboardResponse } from "../models/dashboard-response.ts";
+import StorageWidget from "../components/widgets/StorageWidget.tsx";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData>({
@@ -176,7 +177,7 @@ function Dashboard() {
       case "count":
         return <CountWidget link="repos" count={dashboardData.repoCount} />;
       case "storage":
-        return <CountWidget link="repos" count={dashboardData.storage} />;
+        return <StorageWidget link="repos" count={dashboardData.storage} />;
     }
   }
 

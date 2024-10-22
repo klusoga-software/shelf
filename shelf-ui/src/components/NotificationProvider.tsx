@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useState } from "react";
+import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { Alert, AlertProps } from "@cloudscape-design/components";
 
 interface NotificationProviderProps {
@@ -28,6 +28,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const showNotification = (notification: Notification): void => {
     setNotification(notification);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setNotification(undefined);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [notification]);
 
   const alerts = () => {
     if (notification) {

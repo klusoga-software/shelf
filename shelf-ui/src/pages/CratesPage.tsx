@@ -17,6 +17,7 @@ import Sidenav from "../components/Sidenav.tsx";
 function CratesPage() {
   const [crates, setCrates] = useState<Crate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const params = useParams();
   const [selectedCrates, setSelectedCrates] = useState<Crate[]>([]);
 
@@ -51,12 +52,14 @@ function CratesPage() {
   }
 
   function delete_crate() {
+    setButtonLoading(true);
     for (const crate of selectedCrates) {
       axios
         .delete(`/api/crate/${crate.id}`, {
           headers: { Authorization: `Bearer ${auth.user?.access_token}` },
         })
         .then(() => {
+          setButtonLoading(false);
           get_crates();
           setSelectedCrates([]);
         })
@@ -107,6 +110,7 @@ function CratesPage() {
                   actions={
                     <SpaceBetween direction="horizontal" size="m">
                       <Button
+                        loading={buttonLoading}
                         disabled={selectedCrates.length == 0}
                         onClick={delete_crate}
                       >

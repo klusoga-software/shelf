@@ -26,6 +26,7 @@ import Sidenav from "../components/Sidenav.tsx";
 function ReposPage() {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [repoName, setRepoName] = useState("");
   const [repoType, setRepoType] = useState<SelectProps.Option>({
@@ -99,12 +100,14 @@ function ReposPage() {
   }
 
   function delete_repos() {
+    setButtonLoading(true);
     for (const repo of selectedRepo) {
       axios
         .delete(`/api/repos/${repo.id}`, {
           headers: { Authorization: `Bearer ${auth.user?.access_token}` },
         })
         .then(() => {
+          setButtonLoading(false);
           setSelectedRepo([]);
           load_repos();
         })
@@ -248,6 +251,7 @@ function ReposPage() {
                   actions={
                     <SpaceBetween direction="horizontal" size="m">
                       <Button
+                        loading={buttonLoading}
                         disabled={selectedRepo.length == 0}
                         onClick={delete_repos}
                       >

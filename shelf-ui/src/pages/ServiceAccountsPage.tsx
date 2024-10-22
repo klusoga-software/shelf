@@ -27,6 +27,7 @@ import Sidenav from "../components/Sidenav.tsx";
 
 function ServiceAccountsPage() {
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [serviceAccounts, setServiceAccounts] = useState<ServiceAccount[]>([]);
   const [selectedServiceAccounts, setSelectedServiceAccounts] = useState<
     ServiceAccount[]
@@ -76,12 +77,14 @@ function ServiceAccountsPage() {
       });
   }
   function delete_service_account() {
+    setButtonLoading(true);
     for (const sa of selectedServiceAccounts) {
       axios
         .delete(`/api/service-accounts/${sa.id}`, {
           headers: { Authorization: `Bearer ${auth.user?.access_token}` },
         })
         .then(() => {
+          setButtonLoading(false);
           load_service_accounts();
         })
         .catch((err) => {
@@ -294,6 +297,7 @@ function ServiceAccountsPage() {
                   actions={
                     <SpaceBetween direction="horizontal" size="m">
                       <Button
+                        loading={buttonLoading}
                         disabled={selectedServiceAccounts.length == 0}
                         onClick={delete_service_account}
                       >
