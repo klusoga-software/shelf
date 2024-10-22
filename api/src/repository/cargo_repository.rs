@@ -29,7 +29,7 @@ impl CargoRepository {
     }
 
     pub async fn get_crates_size(&self) -> Result<i64, Error> {
-        sqlx::query_scalar::<_, i64>("select sum(crate_size)::bigint from crates")
+        sqlx::query_scalar::<_, i64>("select coalesce(sum(crate_size)::bigint, 0) from crates;")
             .fetch_one(&self.pool)
             .await
     }

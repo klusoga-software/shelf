@@ -5,6 +5,7 @@ import {
   ContentLayout,
   Header,
   SpaceBetween,
+  Spinner,
 } from "@cloudscape-design/components";
 import {
   Board,
@@ -29,9 +30,12 @@ function Dashboard() {
 
   const [items, setItems] = useState<
     readonly BoardProps.Item<DashboardItemData>[]
-  >([
+  >([]);
+
+  const DEFAULT_WIDGETS: readonly BoardProps.Item<DashboardItemData>[] = [
     {
       id: "count",
+
       data: {
         type: "count",
         header: "Repo Count",
@@ -44,11 +48,12 @@ function Dashboard() {
         header: "Total Storage",
       },
     },
-  ]);
+  ];
 
   const notificationContext = useContext(NotificationContext);
   const { showNotification, alerts } = notificationContext!;
   const auth = useAuth();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -81,6 +86,7 @@ function Dashboard() {
                   },
                   rowSpan: tile.rowSpan,
                   columnSpan: tile.columnSpan,
+                  columnOffset: tile.columnOffset,
                 },
               ]);
               break;
@@ -95,12 +101,17 @@ function Dashboard() {
                   },
                   rowSpan: tile.rowSpan,
                   columnSpan: tile.columnSpan,
+                  columnOffset: tile.columnOffset,
                 },
               ]);
           }
         }
       })
       .catch((err) => {
+        if (err.status === 404) {
+          setItems(DEFAULT_WIDGETS);
+          return;
+        }
         showNotification({
           type: "error",
           header: "Error while fetching dashboard data",
@@ -127,6 +138,7 @@ function Dashboard() {
   }
 
   function save() {
+    setLoading(true);
     const dashboardData = items.map((item) => {
       return {
         id: item.id,
@@ -142,7 +154,14 @@ function Dashboard() {
       .post("/api/dashboard", request, {
         headers: { Authorization: `Bearer ${auth.user?.access_token}` },
       })
-      .then(() => {})
+      .then(() => {
+        showNotification({
+          type: "success",
+          header: "Dashboard saved",
+          message: "Dashboard saved successfully",
+        });
+        setLoading(false);
+      })
       .catch((err) => {
         showNotification({
           type: "error",
@@ -174,7 +193,9 @@ function Dashboard() {
               variant="h1"
               actions={
                 <SpaceBetween size="s">
-                  <Button onClick={save}>Save</Button>
+                  <Button loading={loading} onClick={save}>
+                    Save
+                  </Button>
                 </SpaceBetween>
               }
             >
@@ -215,10 +236,7 @@ function Dashboard() {
                 color="inherit"
               >
                 <SpaceBetween size="m">
-                  <Box variant="strong" color="inherit">
-                    No items
-                  </Box>
-                  <Button iconName="add-plus">Add an item</Button>
+                  <Spinner size="large" />
                 </SpaceBetween>
               </Box>
             }
