@@ -19,6 +19,25 @@ impl DashboardsRepository {
             .execute(&self.pool)
             .await
     }
+
+    pub async fn get_dashboard_by_user_id(
+        &self,
+        user_id: &str,
+    ) -> Result<Option<Dashboard>, Error> {
+        match sqlx::query_as::<_, Dashboard>(
+            r#"select id, user_id, tiles from dashboards where user_id = $1"#,
+        )
+        .bind(user_id)
+        .fetch_one(&self.pool)
+        .await
+        {
+            Ok(tiles) => Ok(Some(tiles)),
+            Err(err) => match err {
+                Error::RowNotFound => Ok(None),
+                _ => Err(err),
+            },
+        }
+    }
 }
 
 #[cfg(test)]

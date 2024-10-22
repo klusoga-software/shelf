@@ -65,7 +65,10 @@ pub struct Dashboard {
 #[derive(Serialize, Deserialize)]
 pub struct DashboardTile {
     pub id: String,
+    #[serde(rename = "rowSpan")]
     pub row_span: Option<i8>,
+    #[serde(rename = "columnSpan")]
     pub column_span: Option<i8>,
+    #[serde(rename = "columnOffset")]
     pub column_offset: Option<HashMap<i8, i8>>,
 }

@@ -19,6 +19,7 @@ import CountWidget from "../components/widgets/CountWidget.tsx";
 import axios from "axios";
 import { useAuth } from "react-oidc-context";
 import { DashboardData } from "../models/dashboard-data.ts";
+import { DashboardResponse } from "../models/dashboard-response.ts";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData>({
@@ -51,6 +52,7 @@ function Dashboard() {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
+      getDashboard();
       getDashboardData();
     }
   }, [auth]);
@@ -59,9 +61,59 @@ function Dashboard() {
     setItems((prevState) => prevState);
   }, [dashboardData]);
 
+  function getDashboard() {
+    axios
+      .get<DashboardResponse[]>("/api/dashboard", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
+      .then((response) => {
+        setItems([]);
+        for (const tile of response.data) {
+          switch (tile.id) {
+            case "count":
+              setItems((prevState) => [
+                ...prevState,
+                {
+                  id: tile.id,
+                  data: {
+                    type: "count",
+                    header: "Repo Count",
+                  },
+                  rowSpan: tile.rowSpan,
+                  columnSpan: tile.columnSpan,
+                },
+              ]);
+              break;
+            case "storage":
+              setItems((prevState) => [
+                ...prevState,
+                {
+                  id: tile.id,
+                  data: {
+                    type: "storage",
+                    header: "Total Storage",
+                  },
+                  rowSpan: tile.rowSpan,
+                  columnSpan: tile.columnSpan,
+                },
+              ]);
+          }
+        }
+      })
+      .catch((err) => {
+        showNotification({
+          type: "error",
+          header: "Error while fetching dashboard data",
+          message: err.response?.data,
+        });
+      });
+  }
+
   function getDashboardData() {
     axios
-      .get("/api/dashboard/data")
+      .get("/api/dashboard/data", {
+        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+      })
       .then((response) => {
         setDashboardData(response.data);
       })
@@ -103,9 +155,9 @@ function Dashboard() {
   function widgetSwitch(item: BoardProps.Item<DashboardItemData>) {
     switch (item.data.type) {
       case "count":
-        return <CountWidget count={dashboardData.repoCount} />;
+        return <CountWidget link="repos" count={dashboardData.repoCount} />;
       case "storage":
-        return <CountWidget count={dashboardData.storage} />;
+        return <CountWidget link="repos" count={dashboardData.storage} />;
     }
   }
 

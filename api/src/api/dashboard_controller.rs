@@ -10,6 +10,7 @@ use std::sync::Arc;
 
 pub fn dashboard_controller() -> Scope {
     Scope::new("/dashboard")
+        .service(get_dashboard)
         .service(create_dashboard)
         .service(receive_dashboard_data)
 }
@@ -31,8 +32,26 @@ async fn create_dashboard(
     Ok(HttpResponse::Ok().finish())
 }
 
+#[get("")]
+async fn get_dashboard(
+    user: User,
+    state: Data<DashboardsRepository>,
+) -> Result<impl Responder, Error> {
+    match state
+        .get_dashboard_by_user_id(&user.claims.sub)
+        .await
+        .map_err(actix_web::error::ErrorBadRequest)?
+    {
+        None => Ok(HttpResponse::NotFound().finish()),
+        Some(dashboard) => Ok(HttpResponse::Ok().json(dashboard.tiles)),
+    }
+}
+
 #[get("/data")]
-async fn receive_dashboard_data(state: Data<CargoRepository>) -> Result<impl Responder, Error> {
+async fn receive_dashboard_data(
+    _user: User,
+    state: Data<CargoRepository>,
+) -> Result<impl Responder, Error> {
     let mut dashboard_builder = DashboardDataBuilder::new();
 
     let state = Arc::new(state);
