@@ -2,22 +2,27 @@ version: 2
 updates:
   - directory: /
     package-ecosystem: cargo
+    target-branch: develop
     schedule:
       interval: daily
     groups:
       cargo:
         patterns:
           - "*"
+
   - directory: /
     package-ecosystem: docker
+    target-branch: develop
     schedule:
       interval: daily
     groups:
       docker:
         patterns:
           - "*"
+
   - directory: /
     package-ecosystem: github-actions
+    target-branch: develop
     schedule:
       interval: daily
     groups:
@@ -25,3 +30,12 @@ updates:
         patterns:
           - "*"
 
+  - directory: /shelf-ui
+    package-ecosystem: pnpm
+    target-branch: develop
+    schedule:
+      interval: daily
+    groups:
+      pnpm:
+        patterns:
+          - "*"
