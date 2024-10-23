@@ -54,7 +54,7 @@ async fn main() -> std::io::Result<()> {
             .unwrap_or("LOCAL".to_string())
             .as_str()
         {
-            "LOCAL" => Box::from(LocalStorage {}),
+            "LOCAL" => Box::from(LocalStorage::new()),
 
             "S3" => {
                 let s3_configuration = configuration

@@ -291,6 +291,7 @@ function ServiceAccountsPage() {
           </Modal>
           <Table
             variant="full-page"
+            empty={<Box>No service accounts found</Box>}
             header={
               <SpaceBetween size="m">
                 <Header
