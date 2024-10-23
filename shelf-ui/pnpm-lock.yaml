@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@cloudscape-design/board-components':
         specifier: ^3.0.81
-        version: 3.0.81(@cloudscape-design/components@3.0.798(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 3.0.81(@cloudscape-design/components@3.0.800(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cloudscape-design/components':
-        specifier: ^3.0.798
-        version: 3.0.798(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.0.800
+        version: 3.0.800(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cloudscape-design/global-styles':
         specifier: ^1.0.32
         version: 1.0.32
@@ -40,14 +40,14 @@ importers:
         specifier: ^9.13.0
         version: 9.13.0
       '@types/react':
-        specifier: ^18.3.11
-        version: 18.3.11
+        specifier: ^18.3.12
+        version: 18.3.12
       '@types/react-dom':
         specifier: ^18.3.1
         version: 18.3.1
       '@vitejs/plugin-react':
         specifier: ^4.3.3
-        version: 4.3.3(vite@5.4.9)
+        version: 4.3.3(vite@5.4.10)
       eslint:
         specifier: ^9.13.0
         version: 9.13.0
@@ -70,8 +70,8 @@ importers:
         specifier: ^8.11.0
         version: 8.11.0(eslint@9.13.0)(typescript@5.6.3)
       vite:
-        specifier: ^5.4.9
-        version: 5.4.9
+        specifier: ^5.4.10
+        version: 5.4.10
 
 packages:
 
@@ -189,8 +189,8 @@ packages:
   '@cloudscape-design/component-toolkit@1.0.0-beta.75':
     resolution: {integrity: sha512-W9RNu6RRzFLl7r6uAqNGw+vdWhMEAEvy+Db7SW+4OsbjZ2sp5fu9m3aFUBfi3kryju+C8F3Dxum3aDLfgI001Q==}
 
-  '@cloudscape-design/components@3.0.798':
-    resolution: {integrity: sha512-yx5PTpaYoxyBSRrWtObDfrfkNmutJI6mwvPawFnfXV13KACPJ8n31+nisVZBoFY6obVMIurG5e0hWEuXahDfgw==}
+  '@cloudscape-design/components@3.0.800':
+    resolution: {integrity: sha512-eS2IZZXmIzsl/Ntbhg1M7YoNMhGmA3bZRGd65MZMFbwOEpPwOEE8Y8faP6c4rQrj+BtvgZ4PEKF9IbV6Td/m5Q==}
     peerDependencies:
       react: ^16.8 || ^17 || ^18
       react-dom: ^16.8 || ^17 || ^18
@@ -573,8 +573,8 @@ packages:
   '@types/react-dom@18.3.1':
     resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
 
-  '@types/react@18.3.11':
-    resolution: {integrity: sha512-r6QZ069rFTjrEYgFdOck1gK7FLVsgJE7tTz0pQBczlBNUhBNk0MQH4UbnFSwjpQLMkLzgqvBBa+qGpLje16eTQ==}
+  '@types/react@18.3.12':
+    resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==}
 
   '@typescript-eslint/eslint-plugin@8.11.0':
     resolution: {integrity: sha512-KhGn2LjW1PJT2A/GfDpiyOfS4a8xHQv2myUagTM5+zsormOmBlYsnQ6pobJ8XxJmh6hnHwa2Mbe3fPrDJoDhbA==}
@@ -1245,9 +1245,6 @@ packages:
     peerDependencies:
       typescript: '>=4.2.0'
 
-  tslib@2.7.0:
-    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
-
   tslib@2.8.0:
     resolution: {integrity: sha512-jWVzBLplnCmoaTr13V9dYbiQ99wvZRd0vNWaDRg+aVYRcjDF3nDksxFDE/+fkXnKhpnUUkmx5pK/v8mCtLVqZA==}
 
@@ -1278,8 +1275,8 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  vite@5.4.9:
-    resolution: {integrity: sha512-20OVpJHh0PAM0oSOELa5GaZNWeDjcAvQjGXy2Uyr+Tp+/D2/Hdz6NLgpJLsarPTA2QJ6v8mX2P1ZfbsSKvdMkg==}
+  vite@5.4.10:
+    resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -1462,10 +1459,10 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@cloudscape-design/board-components@3.0.81(@cloudscape-design/components@3.0.798(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@cloudscape-design/board-components@3.0.81(@cloudscape-design/components@3.0.800(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@cloudscape-design/design-tokens@3.0.44)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@cloudscape-design/component-toolkit': 1.0.0-beta.74
-      '@cloudscape-design/components': 3.0.798(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@cloudscape-design/components': 3.0.800(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cloudscape-design/design-tokens': 3.0.44
       '@cloudscape-design/test-utils-core': 1.0.44
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
@@ -1480,14 +1477,14 @@ snapshots:
   '@cloudscape-design/component-toolkit@1.0.0-beta.74':
     dependencies:
       '@juggle/resize-observer': 3.4.0
-      tslib: 2.7.0
+      tslib: 2.8.0
 
   '@cloudscape-design/component-toolkit@1.0.0-beta.75':
     dependencies:
       '@juggle/resize-observer': 3.4.0
       tslib: 2.8.0
 
-  '@cloudscape-design/components@3.0.798(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@cloudscape-design/components@3.0.800(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@cloudscape-design/collection-hooks': 1.0.55(react@18.3.1)
       '@cloudscape-design/component-toolkit': 1.0.0-beta.75
@@ -1803,9 +1800,9 @@ snapshots:
 
   '@types/react-dom@18.3.1':
     dependencies:
-      '@types/react': 18.3.11
+      '@types/react': 18.3.12
 
-  '@types/react@18.3.11':
+  '@types/react@18.3.12':
     dependencies:
       '@types/prop-types': 15.7.13
       csstype: 3.1.3
@@ -1891,14 +1888,14 @@ snapshots:
       '@typescript-eslint/types': 8.11.0
       eslint-visitor-keys: 3.4.3
 
-  '@vitejs/plugin-react@4.3.3(vite@5.4.9)':
+  '@vitejs/plugin-react@4.3.3(vite@5.4.10)':
     dependencies:
       '@babel/core': 7.25.9
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.25.9)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.25.9)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.9
+      vite: 5.4.10
     transitivePeerDependencies:
       - supports-color
 
@@ -2488,8 +2485,6 @@ snapshots:
     dependencies:
       typescript: 5.6.3
 
-  tslib@2.7.0: {}
-
   tslib@2.8.0: {}
 
   type-check@0.4.0:
@@ -2519,7 +2514,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@5.4.9:
+  vite@5.4.10:
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47
