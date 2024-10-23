@@ -6,6 +6,16 @@ use async_trait::async_trait;
 #[derive(Clone)]
 pub struct LocalStorage {}
 
+impl LocalStorage {
+    pub fn new() -> Self {
+        if let Ok(false) = std::fs::exists("crates") {
+            std::fs::create_dir("crates").expect("Unable to create directory \"crates\"");
+        }
+
+        Self {}
+    }
+}
+
 #[async_trait]
 impl Storage for LocalStorage {
     async fn save(&self, path: String, data: Vec<u8>) -> Result<(), Error> {

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import {
   AppLayout,
+  Box,
   Button,
   ContentLayout,
   Header,
@@ -82,6 +83,7 @@ function CratesPage() {
       content={
         <ContentLayout>
           <Table
+            empty={<Box>No crates found</Box>}
             variant="full-page"
             items={crates}
             selectionType={"multi"}

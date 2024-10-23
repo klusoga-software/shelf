@@ -196,6 +196,7 @@ function ReposPage() {
           </Modal>
           <Table
             items={repos}
+            empty={<Box>No repos found</Box>}
             variant="full-page"
             selectionType={"multi"}
             selectedItems={selectedRepo}

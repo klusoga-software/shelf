@@ -28,7 +28,46 @@ function App() {
 
   return (
     <>
-      <TopNavigation identity={{ href: "/", title: "Shelf" }}></TopNavigation>
+      <TopNavigation
+        identity={{ href: "/", title: "Shelf" }}
+        utilities={[
+          {
+            type: "menu-dropdown",
+            text: auth.user?.profile.name,
+            onItemClick: async ({ detail }) => {
+              switch (detail.id) {
+                case "signout":
+                  await auth.signoutSilent();
+              }
+            },
+            description: auth.user?.profile.email,
+            iconName: "user-profile",
+            items: [
+              {
+                id: "support-group",
+                text: "Support",
+                items: [
+                  {
+                    id: "documentation",
+                    text: "Documentation",
+                    href: "https://klusoga-software.github.io/shelf/",
+                    external: true,
+                    externalIconAriaLabel: " (opens in new tab)",
+                  },
+                  {
+                    id: "feedback",
+                    text: "Feedback",
+                    href: "https://github.com/klusoga-software/shelf/issues",
+                    external: true,
+                    externalIconAriaLabel: " (opens in new tab)",
+                  },
+                ],
+              },
+              { id: "signout", text: "Sign out" },
+            ],
+          },
+        ]}
+      ></TopNavigation>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/repos" element={<ReposPage />} />
